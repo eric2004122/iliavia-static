@@ -1,14 +1,14 @@
-// 首頁「隨機抽一個」：打開頁面時從 /data/picks.json 換成隨機的一張梗圖或一條黑歷史。
+// 首頁「隨機抽一個」：打開頁面時從 data-picks-url（picks.json）換成隨機的一張梗圖或一條黑歷史。
 // 讀不到就保留建置時抽好的那一個。
 (function () {
   var slot = document.querySelector("[data-home-pick]");
-  if (!slot) return;
+  if (!slot || !slot.dataset.picksUrl) return;
   function make(tag, props, text) {
     var element = Object.assign(document.createElement(tag), props || {});
     if (text !== undefined) element.textContent = text;
     return element;
   }
-  fetch("/data/picks.json", { credentials: "same-origin" })
+  fetch(slot.dataset.picksUrl, { credentials: "same-origin" })
     .then(function (response) {
       if (!response.ok) throw new Error(String(response.status));
       return response.json();

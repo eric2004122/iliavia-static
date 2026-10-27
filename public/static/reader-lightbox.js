@@ -10,7 +10,8 @@
     if (!source) return [];
     try {
       const url = new URL(anchor.href, location.href);
-      if (url.origin !== location.origin || !url.pathname.startsWith("/document/image/") || url.username || url.password) return [];
+      // 只放大本站 images/ 底下的原圖（GitHub Pages 的網址前面還有 /repo名稱/）
+      if (url.origin !== location.origin || !url.pathname.startsWith(reader.dataset.imagesUrl || "/images/") || url.username || url.password) return [];
       return [{ anchor, source, url: url.href, alt: source.getAttribute("alt") || "" }];
     } catch (_) {
       return [];

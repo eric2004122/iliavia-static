@@ -1,9 +1,9 @@
-# 讀取 Google 共編文件 → 產生靜態網站 → 發布到 Cloudflare Pages。
+# 讀取 Google 共編文件 → 產生靜態網站 → 發布到 GitHub Pages。
 # 觸發：推送到 main、每小時排程、或在 GitHub「Actions」頁面手動執行（Run workflow）。
 # 排程時只有內容真的變了才重新發布；推送和手動執行一律發布。
-# 需要的設定（GitHub repo → Settings → Secrets and variables → Actions）：
-#   Secrets：CLOUDFLARE_API_TOKEN、CLOUDFLARE_ACCOUNT_ID
-#   Variables（選填）：CF_PAGES_PROJECT（預設 iliavia）、SEARCH_INDEXING、CONTACT_EMAIL、SITE_URL
+# 第一次要到 repo → Settings → Pages，把 Source 設成「GitHub Actions」。
+# Variables（選填，repo → Settings → Secrets and variables → Actions → Variables）：
+#   SEARCH_INDEXING（設 1 才讓搜尋引擎收錄）、CONTACT_EMAIL、SITE_URL
 name: 更新並發布網站
 
 on:
@@ -15,20 +15,18 @@ on:
   workflow_dispatch:
 
 concurrency:
-  group: deploy
+  group: pages
   cancel-in-progress: false
 
 permissions:
   contents: read
 
 jobs:
-  deploy:
+  build:
     runs-on: ubuntu-latest
     timeout-minutes: 25
-    env:
-      SEARCH_INDEXING: ${{ vars.SEARCH_INDEXING }}
-      CONTACT_EMAIL: ${{ vars.CONTACT_EMAIL }}
-      SITE_URL: ${{ vars.SITE_URL }}
+    outputs:
+      changed: ${{ steps.build.outputs.changed }}
     steps:
       - uses: actions/checkout@v4
 
@@ -41,6 +39,10 @@ jobs:
 
       - run: npm test
 
+      # 取得 Pages 網址；專案網站的網址前面會多一段 /repo名稱/
+      - id: pages
+        uses: actions/configure-pages@v5
+
       - name: 取回上一次的內容與原圖
         uses: actions/cache/restore@v4
         with:
@@ -50,22 +52,53 @@ jobs:
 
       - name: 讀取 Google 文件並產生網站
         id: build
+        env:
+          BASE_PATH: ${{ steps.pages.outputs.base_path }}
+          SITE_URL: ${{ vars.SITE_URL || steps.pages.outputs.base_url }}
+          SEARCH_INDEXING: ${{ vars.SEARCH_INDEXING }}
+          CONTACT_EMAIL: ${{ vars.CONTACT_EMAIL }}
         run: node build.mjs
 
-      - name: 發布到 Cloudflare Pages
+      - name: 打包網站
         if: steps.build.outputs.changed == 'true' || github.event_name != 'schedule'
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          PROJECT: ${{ vars.CF_PAGES_PROJECT || 'iliavia' }}
-        run: |
-          # 第一次發布時建立 Pages 專案；已經存在就略過
-          npx --yes wrangler@4.92.0 pages project create "$PROJECT" --production-branch main || true
-          npx --yes wrangler@4.92.0 pages deploy dist --project-name "$PROJECT" --branch main --commit-dirty=true
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+      # 發布成功後才保存這次的內容，所以先交給 deploy 工作
+      - name: 暫存這次的內容與原圖
+        if: steps.build.outputs.changed == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: site-state
+          path: .state
+          include-hidden-files: true
+          retention-days: 1
+
+  deploy:
+    needs: build
+    if: needs.build.outputs.changed == 'true' || github.event_name != 'schedule'
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
+
+      - name: 取出這次的內容與原圖
+        if: needs.build.outputs.changed == 'true'
+        uses: actions/download-artifact@v4
+        with:
+          name: site-state
+          path: .state
 
       # 發布成功才保存，下一次才會拿這次的內容比對
       - name: 保存這次的內容與原圖
-        if: steps.build.outputs.changed == 'true'
+        if: needs.build.outputs.changed == 'true'
         uses: actions/cache/save@v4
         with:
           path: .state

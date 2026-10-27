@@ -10,7 +10,7 @@
   // 舊網址 /document?tab=...：轉到新的分頁網址
   const legacy = params.get('tab');
   if (isIndex && legacy && legacy !== tabId) {
-    const link = Array.from(reader.querySelectorAll('.reader-directory > nav a')).find(a => a.getAttribute('href') === '/document/' + legacy + '/');
+    const link = Array.from(reader.querySelectorAll('.reader-directory > nav a')).find(a => a.getAttribute('href').endsWith('/document/' + legacy + '/'));
     if (link) {
       params.delete('tab');
       location.replace(link.getAttribute('href') + (params.toString() ? '?' + params : '') + location.hash);
@@ -127,7 +127,7 @@
   reader.querySelectorAll('.reader-directory > nav a, .reader-tab-chips a').forEach(link => { link.href = withQuery(link.getAttribute('href')); });
 
   // 5. 各分頁命中數；從 /document/ 搜尋而本頁沒有命中時，直接跳到第一個有命中的分頁
-  fetch('/data/search.json', {credentials: 'same-origin'})
+  fetch(reader.dataset.searchUrl, {credentials: 'same-origin'})
     .then(response => response.ok ? response.json() : Promise.reject(new Error(String(response.status))))
     .then(data => {
       const counts = data.tabs.map(tab => Object.assign({}, tab, {count: tab.id === tabId ? matches.length : (tab.text.match(pattern) || []).length}));

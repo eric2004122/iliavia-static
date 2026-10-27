@@ -39,7 +39,7 @@ function sourceText(html){let depth=0,inside=[],text='';const parser=new Parser(
 test('builds every page, keeps source text exactly and copies original images',async()=>{
   const w=workspace();try{
     const result=await run(w,{fetcher:fakeGoogle().fetcher});assert.equal(result.changed,true);assert.equal(result.tabs,6);
-    for(const page of ['index.html','profile/index.html','document/index.html','document/changes/index.html','settings/index.html','about/index.html','404.html','robots.txt','_headers','_redirects','data/state.json','data/search.json','data/quotes.json','data/picks.json','static/reader-search.js'])assert.ok(existsSync(join(w.outDir,page)),page);
+    for(const page of ['index.html','profile/index.html','document/index.html','document/changes/index.html','settings/index.html','about/index.html','404.html','robots.txt','data/state.json','data/search.json','data/quotes.json','data/picks.json','static/reader-search.js'])assert.ok(existsSync(join(w.outDir,page)),page);
     for(const tab of TABS)assert.equal(sourceText(read(w,`document/${tab.id}/index.html`)),bodyFor(tab),tab.id);
     assert.equal(readdirSync(join(w.outDir,'images')).length,1);
     const primary=read(w,`document/${PRIMARY_TAB}/index.html`);
@@ -53,14 +53,31 @@ test('builds every page, keeps source text exactly and copies original images',a
     const search=JSON.parse(read(w,'data/search.json'));assert.equal(search.tabs.length,6);assert.ok(!search.tabs.find(t=>t.id===HISTORY_TAB).text.endsWith('3\n\t\n'));
   }finally{w.cleanup();}
 });
-test('search engines are kept out unless SEARCH_INDEXING is exactly 1',async()=>{
+test('pages carry their own security policy and stay out of search engines unless SEARCH_INDEXING is exactly 1',async()=>{
   const w=workspace();try{
     await run(w,{fetcher:fakeGoogle().fetcher});
-    assert.match(read(w,'_headers'),/X-Robots-Tag: noindex, nofollow, noimageindex/);assert.match(read(w,'_headers'),/Content-Security-Policy: default-src 'self'; script-src 'self'/);
+    for(const page of ['index.html','profile/index.html',`document/${PRIMARY_TAB}/index.html`,'404.html'])assert.ok(read(w,page).includes(`<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self';`),page);
     assert.equal(read(w,'robots.txt'),'User-agent: *\nDisallow: /\n');assert.ok(read(w,'index.html').includes('<meta name="robots" content="noindex'));
-    await run(w,{offline:true,env:{SEARCH_INDEXING:'1',SITE_URL:'https://example.pages.dev/x'}});
-    assert.ok(!read(w,'_headers').includes('X-Robots-Tag'));assert.ok(!read(w,'index.html').includes('name="robots"'));
-    assert.match(read(w,'robots.txt'),/Sitemap: https:\/\/example\.pages\.dev\/sitemap\.xml/);assert.ok(read(w,'sitemap.xml').includes('/document/'+PRIMARY_TAB+'/'));
+    await run(w,{offline:true,env:{SEARCH_INDEXING:'1',SITE_URL:'https://example.github.io/iliavia-static',BASE_PATH:'/iliavia-static'}});
+    assert.ok(!read(w,'index.html').includes('name="robots"'));
+    assert.match(read(w,'robots.txt'),/Sitemap: https:\/\/example\.github\.io\/iliavia-static\/sitemap\.xml/);assert.ok(read(w,'sitemap.xml').includes('https://example.github.io/iliavia-static/document/'+PRIMARY_TAB+'/'));
+  }finally{w.cleanup();}
+});
+test('GitHub Pages project path prefixes every site link but leaves external links and source text alone',async()=>{
+  const w=workspace();try{
+    await run(w,{fetcher:fakeGoogle().fetcher,env:{BASE_PATH:'/iliavia-static'}});
+    for(const page of ['index.html','profile/index.html','document/index.html',`document/${HISTORY_TAB}/index.html`,'document/changes/index.html','settings/index.html','about/index.html','404.html']){
+      const html=read(w,page);
+      assert.deepEqual(html.match(/\s(?:href|src|action|data-[a-z-]+-url)="\/(?!iliavia-static\/)[^"]*"/g),null,page);
+      assert.ok(html.includes('href="/iliavia-static/static/site.css"'),page);
+    }
+    const reader=read(w,`document/${PRIMARY_TAB}/index.html`);
+    for(const part of ['data-document-state-url="/iliavia-static/data/state.json"','data-search-url="/iliavia-static/data/search.json"','data-images-url="/iliavia-static/images/"','src="/iliavia-static/images/','href="https://www.youtube.com/@Iliaviasocute"'])assert.ok(reader.includes(part),part);
+    assert.equal(sourceText(reader),BODIES[PRIMARY_TAB]);
+    assert.ok(read(w,'index.html').includes('data-picks-url="/iliavia-static/data/picks.json"'));
+    assert.ok(JSON.parse(read(w,'data/search.json')).tabs.every(t=>t.path.startsWith('/iliavia-static/document/')));
+    assert.ok(JSON.parse(read(w,'data/picks.json')).filter(p=>p.kind==='meme').every(p=>p.url.startsWith('/iliavia-static/images/')));
+    await assert.rejects(run(w,{offline:true,env:{BASE_PATH:'/../evil'}}),/BASE_PATH/);
   }finally{w.cleanup();}
 });
 test('unchanged source is reported as unchanged and records no new revision',async()=>{
