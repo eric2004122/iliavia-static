@@ -1,0 +1,72 @@
+/* A quiet viewing surface around the original artwork; no image filters or crops. */
+.reader-lightbox{
+  width:min(1180px,calc(100vw - 48px));height:min(880px,calc(100dvh - 48px));
+  max-width:none;max-height:none;margin:auto;padding:0;overflow:hidden;
+  border:2px solid var(--portrait-edge,var(--line));border-radius:26px;
+  background:var(--surface);color:var(--ink);box-shadow:var(--hero-shadow);
+  font:16px/1.6 var(--sans);
+}
+.reader-lightbox::backdrop{background:rgb(51 27 43 / .72)}
+.reader-lightbox-surface{display:flex;flex-direction:column;height:100%;min-height:0;background:var(--surface)}
+.reader-lightbox-header{display:flex;align-items:center;justify-content:space-between;gap:20px;padding:18px 24px 12px;background:var(--paper);flex:none}
+.reader-lightbox-heading{display:flex;align-items:baseline;flex-wrap:wrap;gap:6px 14px;min-width:0}
+.reader-lightbox-heading h2{margin:0;font-size:23px;line-height:1.4;letter-spacing:-.02em}
+.reader-lightbox-count{margin:0;color:var(--muted);font-size:15px;font-variant-numeric:tabular-nums}
+.reader-lightbox-button{
+  display:inline-flex;align-items:center;justify-content:center;min-width:44px;min-height:44px;
+  padding:8px 14px;border:1px solid transparent;border-radius:12px;
+  background:var(--gold-soft);color:var(--ink);font:inherit;line-height:1.3;cursor:pointer;
+  transition:transform 120ms var(--motion-ease,cubic-bezier(.2,0,0,1));
+}
+.reader-lightbox-button:hover:not(:disabled){background:var(--gold)}
+.reader-lightbox-button:active:not(:disabled){transform:scale(.97)}
+.reader-lightbox-button:disabled{background:var(--paper);color:var(--muted);border-color:var(--line);cursor:default}
+.reader-lightbox-button:focus-visible,.reader-lightbox-original:focus-visible,.reader-lightbox-viewport:focus-visible{outline:3px solid var(--accent);outline-offset:3px}
+.reader-lightbox-close{flex:none;background:var(--accent-soft);color:var(--accent-hover,var(--ink))}
+.reader-lightbox-close:hover:not(:disabled){background:var(--pink)}
+.reader-lightbox-toolbar{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px 20px;padding:12px 24px;flex:none}
+.reader-lightbox-navigation,.reader-lightbox-zoom{display:flex;align-items:center;gap:8px}
+.reader-lightbox-zoom-value{display:inline-flex;align-items:center;justify-content:center;min-width:52px;color:var(--ink);font-variant-numeric:tabular-nums;font-size:15px}
+.reader-lightbox-fit{background:var(--accent-soft)}
+.reader-lightbox-viewport{position:relative;flex:1;min-height:100px;overflow:auto;overscroll-behavior:contain;scrollbar-gutter:stable;scrollbar-color:var(--line-strong) var(--paper);background:var(--paper);outline-offset:-4px}
+.reader-lightbox-stage{display:grid;place-items:center;min-width:100%;min-height:100%;width:max-content;height:max-content;padding:24px}
+.reader-lightbox-image{display:block;max-width:none;max-height:none;flex:none;object-fit:contain;border-radius:0}
+.reader-lightbox-image[hidden]{display:none}
+.reader-lightbox-image-error{max-width:28ch;padding:24px;margin:0;text-align:center;color:var(--muted);overflow-wrap:anywhere}
+.reader-lightbox-information{display:flex;align-items:center;justify-content:space-between;gap:10px 20px;padding:8px 24px 0;flex:none}
+.reader-lightbox-status{min-width:0;margin:0;color:var(--muted);font-size:14px;overflow-wrap:anywhere;max-height:4.8em;overflow:auto}
+.reader-lightbox-status.is-error{color:var(--danger)}
+.reader-lightbox-original{display:inline-flex;align-items:center;min-height:44px;white-space:nowrap;flex:none;color:var(--accent-hover,var(--accent));font-size:14px}
+.reader-lightbox-help{margin:0;padding:0 24px 14px;color:var(--muted);font-size:13px;line-height:1.5;flex:none}
+@media(prefers-reduced-motion:no-preference){
+  .reader-lightbox[open] .reader-lightbox-surface{animation:reader-lightbox-enter 220ms cubic-bezier(.2,.7,.2,1) both}
+  .reader-lightbox[open]::backdrop{animation:reader-lightbox-dim-enter 220ms ease-out both}
+  .reader-lightbox[open].is-closing .reader-lightbox-surface{animation:reader-lightbox-exit 140ms cubic-bezier(.3,0,1,1) both}
+  .reader-lightbox[open].is-closing::backdrop{animation:reader-lightbox-dim-exit 140ms ease-in both}
+}
+@keyframes reader-lightbox-enter{from{opacity:.55;transform:translateY(8px) scale(.985)}to{opacity:1;transform:translateY(0) scale(1)}}
+@keyframes reader-lightbox-exit{from{opacity:1;transform:translateY(0) scale(1)}to{opacity:0;transform:translateY(4px) scale(.99)}}
+@keyframes reader-lightbox-dim-enter{from{opacity:0}to{opacity:1}}
+@keyframes reader-lightbox-dim-exit{from{opacity:1}to{opacity:0}}
+@media(max-width:600px){
+  .reader-lightbox{width:calc(100vw - 20px);height:calc(100dvh - 20px);border-radius:20px}
+  .reader-lightbox-header{padding:14px 14px 10px;gap:12px}
+  .reader-lightbox-heading{gap:4px 10px}.reader-lightbox-heading h2{font-size:20px}
+  .reader-lightbox-toolbar{padding:10px 14px;gap:10px;align-items:center}
+  .reader-lightbox-navigation{gap:6px}.reader-lightbox-button{padding-inline:10px;font-size:14px}
+  .reader-lightbox-zoom{gap:6px}.reader-lightbox-zoom-value{min-width:42px;font-size:14px}
+  .reader-lightbox-stage{padding:16px}
+  .reader-lightbox-information{align-items:flex-start;padding:8px 14px 0;gap:8px}
+  .reader-lightbox-status{padding-top:8px;font-size:13px;max-height:5.4em}
+  .reader-lightbox-original{font-size:13px}
+  .reader-lightbox-help{padding:0 14px 12px;font-size:12px}
+}
+@media(max-height:450px) and (min-width:601px){
+  .reader-lightbox{height:calc(100dvh - 20px);width:calc(100vw - 32px)}
+  .reader-lightbox-header{padding:8px 16px 0}.reader-lightbox-heading h2{font-size:18px}
+  .reader-lightbox-toolbar{padding:4px 16px}.reader-lightbox-information{padding:0 16px}
+  .reader-lightbox-help{display:none}.reader-lightbox-stage{padding:12px}
+}
+@media(prefers-reduced-motion:reduce){
+  .reader-lightbox,.reader-lightbox *,.reader-lightbox::backdrop{animation:none!important;transition:none!important;scroll-behavior:auto!important}
+}

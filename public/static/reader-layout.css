@@ -1,0 +1,321 @@
+/* 既有黃粉閱讀器的排版覆寫。原文、DOM 順序與原圖均不修改。
+   桌機欄名 160px = 128px 文字區 + 兩側各 16px。
+   table-row 的 height 是最小高度，內容增加時仍由瀏覽器自然展開。 */
+.document-reader{
+  --reader-measure:50rem;
+  --reader-label-width:160px;
+  --reader-cell-space:16px;
+  --reader-section-space:28px;
+  --reader-row-line:var(--line);
+}
+
+.document-reader .reader-page-heading,
+.document-reader .reader-tools,
+.document-reader .reader-match-navigation,
+.document-reader .reader-body,
+.document-reader .reader-images,
+.document-reader .reader-source-links{
+  max-inline-size:var(--reader-measure);
+  margin-inline:auto;
+}
+
+.document-reader .reader-body{
+  font-size:17px;
+  line-height:1.85;
+  tab-size:0;
+  text-indent:0;
+}
+.document-reader .reader-section{
+  margin-block:var(--reader-section-space);
+}
+.document-reader .reader-section[hidden]{display:none}
+.document-reader .reader-section:first-child{margin-block-start:0}
+.document-reader .reader-section:last-child{margin-block-end:0}
+.document-reader .reader-section-title{
+  margin:0 0 12px;
+  font-size:19px;
+  line-height:1.55;
+  text-wrap:wrap;
+  text-align:center;
+}
+.document-reader .reader-page-heading,
+.document-reader .reader-block-heading h3,
+.document-reader .reader-source-links>h3{
+  text-align:center;
+}
+.document-reader .reader-images-heading{
+  justify-content:center;
+  text-align:center;
+}
+
+/* pre-line 保留原文換行，同時收斂匯出檔的 tabs／行首空格縮排。
+   來源空白 span 仍保留在 DOM；只收斂其後的額外視覺空行。 */
+.document-reader .reader-block,
+.document-reader .reader-field-value{
+  white-space:pre-line;
+  tab-size:0;
+  text-indent:0;
+  overflow-wrap:anywhere;
+  word-break:normal;
+}
+.document-reader .reader-source-space{display:none}
+.document-reader .reader-source-space+br+br{display:none}
+.document-reader .reader-block-space,
+.document-reader .reader-source-row:has(.reader-block-space){display:none}
+
+.document-reader .reader-block-heading{
+  margin:0;
+  padding:0;
+  white-space:normal;
+}
+.document-reader .reader-block-heading h3{
+  margin:0;
+  padding:0;
+  font-size:19px;
+  line-height:1.55;
+  white-space:normal;
+  tab-size:0;
+  text-indent:0;
+  text-wrap:wrap;
+  overflow-wrap:anywhere;
+}
+.document-reader .reader-section-prose:has(.reader-block-paragraph),
+.document-reader .reader-section-events{
+  padding:20px;
+  border-radius:18px;
+}
+.document-reader .reader-block-paragraph,
+.document-reader .reader-block-event{
+  font-size:17px;
+  line-height:1.85;
+}
+.document-reader .reader-block-paragraph+.reader-block-paragraph{margin-block-start:12px}
+.document-reader .reader-block-heading+.reader-block-paragraph{margin-block-start:12px}
+
+.document-reader .reader-field-table{
+  inline-size:100%;
+  max-inline-size:100%;
+  table-layout:fixed;
+  border-collapse:separate;
+  border-spacing:0;
+  margin:0;
+  font-size:17px;
+  line-height:1.9;
+  background:transparent;
+}
+.document-reader .reader-field-table tr{background:transparent}
+.document-reader .reader-field-table tr[data-source-block]{height:64px}
+.document-reader .reader-field-table th,
+.document-reader .reader-field-table td{
+  padding:var(--reader-cell-space);
+  border:0;
+  border-block-end:1px solid var(--reader-row-line);
+  vertical-align:top;
+  text-align:start;
+  font-weight:400;
+  overflow-wrap:anywhere;
+}
+.document-reader .reader-field-table .reader-field-label{
+  display:table-cell;
+  inline-size:var(--reader-label-width);
+  width:var(--reader-label-width);
+  margin:0;
+  font-size:15px;
+  font-weight:700;
+  line-height:1.8;
+  white-space:normal;
+  word-break:normal;
+  tab-size:0;
+  text-indent:0;
+  color:var(--accent-hover);
+  background:var(--paper);
+}
+.document-reader .reader-field-table .reader-field-value{
+  display:table-cell;
+  font-size:17px;
+  line-height:1.9;
+  background:var(--surface);
+}
+.document-reader .reader-field-table .reader-source-row{
+  height:auto;
+  background:transparent;
+}
+.document-reader .reader-field-table .reader-source-row>td{
+  padding:0;
+  border:0;
+  background:transparent;
+}
+.document-reader .reader-field-table .reader-source-row .reader-block:not(.reader-block-space){
+  padding-block:12px;
+}
+
+/* 測驗頁沿用來源的項目／結果對照；長題目保有固定比例，答案自然換行。 */
+.document-reader .reader-field-table.reader-results-table{
+  --reader-label-width:36%;
+}
+.document-reader .reader-results-table thead th{
+  font-size:16px;
+  font-weight:700;
+  color:var(--ink);
+  background:var(--gold-soft);
+}
+.document-reader .reader-results-table thead th:first-child{
+  width:var(--reader-label-width);
+}
+
+/* 統一的是展示框，圖片使用 contain；長直圖的細節交由既有放大器查看。
+   不裁切、不遮罩、不重編碼，也不影響放大器的原始圖片尺寸。 */
+.document-reader .reader-gallery{
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  align-items:start;
+  gap:20px;
+}
+.document-reader .reader-image-card{
+  padding:10px 10px 0;
+  border-radius:20px;
+}
+.document-reader .reader-image-original{
+  position:relative;
+  display:block;
+  inline-size:100%;
+  aspect-ratio:4/3;
+  min-block-size:0;
+  background:var(--surface);
+  text-decoration:none;
+}
+.document-reader .reader-image-original img{
+  position:absolute;
+  inset:0;
+  display:block;
+  inline-size:100%;
+  block-size:100%;
+  width:100%;
+  height:100%;
+  min-inline-size:0;
+  min-block-size:0;
+  max-inline-size:100%;
+  max-block-size:100%;
+  object-fit:contain;
+  object-position:center;
+  border-radius:0;
+}
+.document-reader .reader-image-card figcaption{
+  min-block-size:52px;
+  padding:4px;
+  line-height:1.65;
+}
+.document-reader .reader-gallery:has(>.reader-image-card:only-child){
+  grid-template-columns:minmax(0,1fr);
+  justify-items:center;
+}
+.document-reader .reader-gallery>.reader-image-card:only-child{
+  inline-size:min(100%,28rem);
+}
+.document-reader .reader-image-gap{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  aspect-ratio:4/3;
+  text-align:center;
+}
+
+@media(max-width:850px){
+  .document-reader{--reader-section-space:24px}
+  .document-reader .reader-field-table,
+  .document-reader .reader-field-table tbody{
+    display:block;
+    inline-size:100%;
+  }
+  .document-reader .reader-field-table tr[data-source-block]{
+    display:block;
+    height:auto;
+    min-block-size:72px;
+    margin:0;
+    padding:16px;
+    border:0;
+    border-block-end:1px solid var(--reader-row-line);
+    border-radius:0;
+    background:var(--surface);
+  }
+  .document-reader .reader-field-table .reader-field-label,
+  .document-reader .reader-field-table .reader-field-value{
+    display:block;
+    inline-size:100%;
+    width:100%;
+    padding:0;
+    border:0;
+    font-size:16px;
+    line-height:1.85;
+    background:transparent;
+  }
+  .document-reader .reader-field-table .reader-field-label{margin-block-end:6px}
+  .document-reader .reader-field-table .reader-source-row,
+  .document-reader .reader-field-table .reader-source-row>td{
+    display:block;
+    inline-size:100%;
+  }
+  .document-reader .reader-field-table .reader-source-row:has(.reader-block-space){display:none}
+}
+
+@media(max-width:600px){
+  .document-reader{--reader-section-space:20px}
+  .document-reader .reader-body,
+  .document-reader .reader-block-paragraph,
+  .document-reader .reader-block-event{
+    font-size:16px;
+    line-height:1.85;
+  }
+  .document-reader .reader-section-title,
+  .document-reader .reader-block-heading h3{
+    font-size:18px;
+    line-height:1.55;
+  }
+  .document-reader .reader-section-prose:has(.reader-block-paragraph),
+  .document-reader .reader-section-events{padding:16px}
+  .document-reader .reader-gallery{
+    grid-template-columns:minmax(0,1fr);
+    gap:16px;
+  }
+}
+
+/* 手機的測驗仍是左右兩欄；不套用一般個人資料表的上下堆疊。 */
+@media(max-width:850px){
+  .document-reader .reader-field-table.reader-results-table{
+    --reader-label-width:40%;
+    display:table;
+    table-layout:fixed;
+  }
+  .document-reader .reader-field-table.reader-results-table thead{display:table-header-group}
+  .document-reader .reader-field-table.reader-results-table tbody{display:table-row-group}
+  .document-reader .reader-field-table.reader-results-table tr[data-source-block]{
+    display:table-row;
+    height:64px;
+    min-block-size:0;
+    padding:0;
+    border:0;
+  }
+  .document-reader .reader-field-table.reader-results-table .reader-field-label,
+  .document-reader .reader-field-table.reader-results-table .reader-field-value{
+    display:table-cell;
+    padding:12px;
+    border-block-end:1px solid var(--reader-row-line);
+    font-size:16px;
+    line-height:1.85;
+    text-align:start;
+  }
+  .document-reader .reader-field-table.reader-results-table .reader-field-label{
+    inline-size:var(--reader-label-width);
+    width:var(--reader-label-width);
+    background:var(--paper);
+  }
+  .document-reader .reader-field-table.reader-results-table .reader-field-value{
+    inline-size:auto;
+    width:auto;
+  }
+  .document-reader .reader-results-table thead th{
+    padding:12px;
+    font-size:16px;
+    line-height:1.85;
+  }
+}

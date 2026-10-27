@@ -1,0 +1,135 @@
+/* 介紹頁：沿用 cards.css 的黃粉色票、圓角與陰影；版面來自 avia-mvc 的小卡設計。
+   字級只用 --small(14) / --body(16) / --lead(20) / 28 / 名字的大字，五級以內。 */
+.profile-hero{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:32px;align-items:center;padding-block:40px 24px}
+.profile-name{margin:0;font-size:clamp(40px,7vw,76px);line-height:1.1;color:var(--accent);text-wrap:balance}
+.profile-lede{margin:16px 0 0;font-size:var(--lead);line-height:1.6;max-width:32em}
+.profile-aliases{list-style:none;margin:20px 0 0;padding:0;display:flex;flex-wrap:wrap;gap:10px}
+.profile-aliases li{padding:5px 14px;border-radius:999px;background:var(--surface);border:2px solid var(--line);box-shadow:var(--card-shadow)}
+.profile-aliases li:nth-child(3n+1){background:var(--accent-soft);transform:rotate(-1.5deg)}
+.profile-aliases li:nth-child(3n){background:var(--gold-soft);transform:rotate(1deg)}
+.profile-card{background:var(--gold-card);border:2px solid var(--card-border);border-radius:var(--card-radius);box-shadow:var(--hero-shadow);padding:22px 24px;transform:rotate(1deg)}
+.profile-card h2{margin:0 0 12px;font-size:var(--lead)}
+.profile-card dl{margin:0;display:grid;grid-template-columns:auto minmax(0,1fr);gap:8px 16px}
+.profile-card dt{color:var(--muted);font-size:var(--small)}
+.profile-card dd{margin:0;min-width:0;overflow-wrap:anywhere}
+
+.profile-section{padding-block:28px}
+.profile-section>.section-heading{margin-bottom:16px}
+.profile-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:20px}
+.profile-grid.is-three{grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr))}
+.profile-panel{background:var(--surface);border:2px solid var(--line);border-radius:var(--card-radius);box-shadow:var(--card-shadow);padding:20px 22px;min-width:0}
+.profile-panel h2{margin:0 0 12px;font-size:var(--lead)}
+.profile-panel h3{margin:0 0 10px;font-size:var(--lead)}
+.profile-panel h3+*{margin-top:0}
+.profile-panel *+h3{margin-top:18px}
+.profile-panel p{margin:0 0 8px}
+.profile-panel h3 small{font-size:var(--small);color:var(--accent-hover);margin-left:6px}
+
+.profile-chips{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:8px}
+.profile-chips li{padding:3px 12px;border-radius:999px;background:var(--accent-soft);font-size:var(--small)}
+.profile-chips.is-gold li{background:var(--gold-soft)}
+.profile-chips.is-outline li{background:transparent;border:1.5px solid var(--line)}
+
+.profile-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,200px),1fr));gap:16px}
+.profile-stat{display:flex;flex-direction:column;gap:4px;background:var(--surface);border:2px solid var(--line);border-radius:var(--card-radius);box-shadow:var(--card-shadow);padding:16px 18px;min-width:0}
+.profile-stat-label{font-size:var(--small);color:var(--muted)}
+.profile-stat strong{font-size:28px;line-height:1.25;color:var(--accent);font-weight:400}
+.profile-stat-detail{font-size:var(--small);color:var(--muted)}
+
+.profile-height{margin:20px 0 0;background:var(--surface);border:2px solid var(--line);border-radius:var(--card-radius);box-shadow:var(--card-shadow);padding:18px 22px}
+.profile-height figcaption{font-size:var(--lead);margin-bottom:10px}
+.profile-ruler{display:block;width:100%;height:44px;border-radius:12px;overflow:hidden;border:2px solid var(--ink)}
+.ruler-rest{fill:var(--pink)}
+.ruler-shoes{fill:var(--yellow)}
+.ruler-pride{fill:var(--accent)}
+.profile-legend{list-style:none;margin:10px 0 0;padding:0;display:flex;flex-wrap:wrap;gap:6px 18px;font-size:var(--small);color:var(--muted)}
+.profile-legend li::before{content:"";display:inline-block;width:12px;height:12px;margin-right:6px;border:1.5px solid var(--ink);border-radius:3px;vertical-align:-1px}
+.legend-rest::before{background:var(--pink)}
+.legend-shoes::before{background:var(--yellow)}
+.legend-pride::before{background:var(--accent)}
+.profile-source{margin:8px 0 0;font-size:var(--small);color:var(--muted)}
+
+.profile-tests{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,220px),1fr));gap:14px}
+.profile-test{display:flex;flex-direction:column;gap:4px;background:var(--pink-card);border-radius:var(--card-radius);box-shadow:var(--card-shadow);padding:14px 18px;min-width:0}
+.profile-test span{font-size:var(--small);color:var(--ink)}
+/* 粉紅底上用較深的粉紅，對比才到 4.5:1 以上 */
+.profile-test strong{font-size:var(--lead);font-weight:400;color:var(--accent-hover)}
+.profile-test.is-long strong{font-size:var(--body);color:var(--ink)}
+
+.profile-list{list-style:none;margin:0;padding:0}
+.profile-list li{padding:7px 0 7px 22px;border-bottom:1.5px dashed var(--line);position:relative}
+.profile-list li::before{content:"";position:absolute;left:4px;top:calc(7px + .8em);width:7px;height:7px;border-radius:50%;background:var(--accent);transform:translateY(-50%)}
+.profile-list small,.profile-goals small{color:var(--muted)}
+
+.profile-trophies{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,240px),1fr));gap:14px}
+.profile-trophies li{background:var(--gold-card);border-radius:var(--card-radius);box-shadow:var(--card-shadow);padding:14px 18px;min-width:0}
+.profile-trophies small{display:block;color:var(--muted);font-size:var(--small)}
+
+.profile-cheer figure{margin:0 auto;max-width:760px;background:var(--surface);border:2px solid var(--line);border-radius:var(--card-radius);box-shadow:var(--hero-shadow);padding:12px;transform:rotate(-1deg)}
+.profile-cheer img{display:block;width:100%;height:auto;border-radius:16px}
+.profile-cheer figcaption{text-align:center;padding:10px 6px 2px}
+
+.profile-quote-stage{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:20px;align-items:center;margin-bottom:20px}
+.profile-bubble{margin:0;background:var(--surface);border:3px solid var(--ink);border-radius:28px;padding:22px 28px;font-size:clamp(24px,3vw,28px);line-height:1.35;min-height:96px;display:flex;align-items:center}
+/* 抽到新的一句：平常是輕微放大，減少動態時改成淡入，回饋還在但不位移 */
+.profile-bubble.is-popping{animation:profile-pop .3s ease-out}
+@keyframes profile-pop{from{transform:scale(.95)}to{transform:scale(1)}}
+@keyframes profile-fade{from{opacity:.35}to{opacity:1}}
+@media (prefers-reduced-motion:reduce){.profile-bubble.is-popping{animation:profile-fade .25s ease-out}.profile-aliases li,.profile-card,.profile-cheer figure{transform:none}}
+
+.profile-saying{margin:0;background:var(--surface);border:2px solid var(--line);border-radius:var(--card-radius);box-shadow:var(--card-shadow);padding:20px 22px}
+.profile-saying p{margin:0 0 10px;font-size:var(--lead)}
+.profile-saying p::before{content:"「";color:var(--accent)}
+.profile-saying p::after{content:"」";color:var(--accent)}
+.profile-saying footer{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:var(--small);color:var(--muted)}
+
+.profile-typos{width:100%;border-collapse:collapse}
+.profile-typos th,.profile-typos td{text-align:left;padding:8px 10px;border-bottom:1.5px dashed var(--line)}
+.profile-typos th{font-size:var(--small);color:var(--muted);font-weight:400}
+.profile-typos td:first-child{color:var(--accent);font-size:var(--lead)}
+.profile-goals{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.profile-goals li{padding-left:28px;position:relative}
+.profile-goals li::before{content:"";position:absolute;left:0;top:5px;width:16px;height:16px;border:2px solid var(--ink);border-radius:5px;background:var(--surface)}
+
+.profile-adult{margin-top:20px}
+.profile-sensitive>summary{display:flex;align-items:baseline;gap:8px;cursor:pointer;font-size:var(--lead);list-style:none}
+.profile-sensitive>summary::-webkit-details-marker{display:none}
+.profile-sensitive>summary::before{content:"＋";color:var(--accent)}
+.profile-sensitive[open]>summary::before{content:"－"}
+.profile-sensitive>summary small{font-size:var(--small);color:var(--muted)}
+.profile-sensitive[open]>summary{margin-bottom:12px}
+.profile-panel .profile-sensitive{margin-top:18px;padding-top:14px;border-top:1.5px dashed var(--line)}
+.profile-sensitive-bar{margin:16px 0 0}
+.profile-court{background:var(--gold-card)}
+.profile-stamp{display:inline-block;color:var(--accent);border:2px solid var(--accent);border-radius:8px;padding:1px 10px;transform:rotate(-3deg)}
+
+.profile-history{list-style:none;margin:0;padding:0;columns:2 320px;column-gap:28px}
+.profile-history li{break-inside:avoid;display:grid;grid-template-columns:40px minmax(0,1fr);gap:10px;padding:8px 0;border-bottom:1.5px dashed var(--line)}
+.profile-history-no{text-align:center;font-size:var(--small);align-self:start;margin-top:3px;border:1.5px solid var(--line-strong);border-radius:6px;background:var(--accent-soft);font-variant-numeric:tabular-nums}
+.profile-history li.is-milestone{color:var(--accent)}
+.profile-history li.is-milestone .profile-history-no{background:var(--yellow)}
+
+.profile-streams{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,240px),1fr));gap:14px}
+.profile-stream{display:flex;flex-direction:column;gap:6px;background:var(--surface);border:2px solid var(--line);border-radius:var(--card-radius);box-shadow:var(--card-shadow);padding:16px 18px;color:inherit;text-decoration:none;min-width:0}
+a.profile-stream:hover{border-color:var(--accent)}
+@media (prefers-reduced-motion:no-preference){
+  .profile-stream{transition:transform var(--motion-quick) var(--motion-ease),border-color var(--motion-quick) var(--motion-ease)}
+  a.profile-stream:hover{transform:translateY(-2px)}
+}
+.profile-stream .type-label{align-self:flex-start}
+
+.profile-memes{columns:4 200px;column-gap:14px}
+.profile-meme{display:block;break-inside:avoid;margin:0 0 14px;background:var(--surface);border:2px solid var(--line);border-radius:16px;padding:6px;box-shadow:var(--card-shadow)}
+.profile-meme img{display:block;width:100%;height:auto;border-radius:11px}
+
+.profile-sync{margin:24px 0 8px;font-size:var(--small);color:var(--muted)}
+.profile-more{display:inline-block;margin-top:14px}
+
+@media (max-width:860px){
+  .profile-hero{grid-template-columns:minmax(0,1fr)}
+  .profile-card{transform:none}
+}
+@media (max-width:560px){
+  .profile-quote-stage{grid-template-columns:minmax(0,1fr)}
+  .profile-history{columns:1}
+}

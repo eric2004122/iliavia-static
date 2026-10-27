@@ -1,0 +1,37 @@
+/* Public pages only: native navigation keeps its URLs, focus and history.
+   The short crossfade keeps context changes brief and never translates,
+   crops or scales the original portrait. */
+@media (prefers-reduced-motion: no-preference) {
+  @view-transition {
+    navigation: auto;
+  }
+
+  ::view-transition-old(root) {
+    animation: avia-page-out 140ms cubic-bezier(.3, 0, 1, 1) both;
+    mix-blend-mode: normal;
+  }
+
+  ::view-transition-new(root) {
+    animation: avia-page-in 220ms cubic-bezier(.2, 0, 0, 1) both;
+    mix-blend-mode: normal;
+  }
+}
+
+@keyframes avia-page-out {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+@keyframes avia-page-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Covers a preference changed while a browser transition is already running. */
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+}

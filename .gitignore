@@ -1,0 +1,12 @@
+# 依賴與產生的網站
+/node_modules/
+/dist/
+
+# 上一次的 Google 文件內容與原圖：只放在 GitHub Actions 快取，不進 Git
+/.state/
+
+# 本機設定與金鑰
+.env*
+.dev.vars*
+
+.DS_Store

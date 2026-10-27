@@ -1,0 +1,91 @@
+/* 共編筆記改版：只改外觀，原文文字與 DOM 順序不動。
+   白底細框當內容卡片，黃色只留給重點（目前分頁、搜尋命中、新內容提示）。
+   字級只用 --small(14) / --body(16) / --lead(20) 和標題。 */
+:root{--reader-on-accent:rgb(255 255 255 / .25)}
+
+/* 標題：放大，並用一句話說明這頁是什麼 */
+.document-reader .reader-heading-title{display:flex;align-items:center;flex-wrap:wrap;gap:8px 16px;flex:1 1 0;min-width:0}
+.document-reader .reader-heading-links{flex:none}
+.document-reader .reader-heading-links>a,.document-reader .reader-heading-links summary{white-space:nowrap}
+.document-reader .reader-heading h1{font-size:clamp(32px,3.2vw,40px);line-height:1.25}
+/* 用 width 換行；不用 flex-basis，否則手機直排時會被當成高度 */
+.document-reader .reader-heading-lede{order:3;width:100%;max-width:40em;margin:0;font-size:var(--lead);line-height:1.6;color:var(--ink)}
+
+/* 同步狀態：標題旁的小膠囊，取代整條黃色橫幅 */
+.reader-sync-pill{margin:0;padding:4px 12px;border-radius:999px;border:1.5px solid var(--line);background:var(--surface);color:var(--muted);font-size:var(--small);line-height:1.6;white-space:nowrap}
+.reader-sync-pill.is-error{border-color:var(--accent);color:var(--accent-hover);background:var(--accent-soft)}
+
+/* 分頁：桌機側欄加數量徽章；窄螢幕改成可以橫向滑動的標籤 */
+.reader-directory nav a[data-count]::after,
+.reader-tab-chips a[data-count]::after{content:attr(data-count);flex:none;margin-left:auto;padding:0 8px;border-radius:999px;background:var(--surface);color:var(--muted);font-size:var(--small);font-weight:400;line-height:1.6;font-variant-numeric:tabular-nums}
+.reader-directory nav a[data-count]{gap:8px}
+.reader-tab-chips{display:none}
+@media(max-width:850px){
+  .reader-tab-chips{display:flex;gap:8px;margin:0 0 16px;padding:4px 0 8px;overflow-x:auto;overscroll-behavior-x:contain;scroll-snap-type:x proximity;scroll-padding-inline:16px;scrollbar-width:thin;scrollbar-color:var(--line-strong) transparent}
+  .reader-tab-chips a{flex:none;display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:8px 16px;border-radius:999px;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);font-size:var(--small);text-decoration:none;white-space:nowrap;scroll-snap-align:start}
+  .reader-tab-chips a[aria-current]{border-color:var(--accent);background:var(--accent);color:var(--surface);font-weight:700}
+  .reader-tab-chips a[aria-current]::after{background:var(--reader-on-accent);color:var(--surface)}
+}
+
+/* 色彩層次：連結區、段落區改白底細框 */
+.document-reader .reader-source-links{background:var(--surface);border:1.5px solid var(--line)}
+.document-reader .reader-section-prose:has(.reader-block-paragraph){background:var(--surface);border:1.5px solid var(--line)}
+
+/* 搜尋與目錄：不再是卡片裡的卡片，攤平成一列開關，展開後內容直接接在下面 */
+.document-reader .reader-tools{background:transparent;border:0;border-radius:0;box-shadow:none}
+.document-reader .reader-tools>summary{padding-inline:0;min-height:44px}
+.document-reader .reader-tools-content{padding-inline:0}
+
+/* 原文裡的裝飾標題（♡₍ᐢ.ˬ.ᐢ₎ 等）：文字照留，改成靠左的小標籤 */
+.document-reader .reader-block-heading{text-align:start}
+.document-reader .reader-block-heading h3{display:inline-block;padding:4px 16px;border-radius:999px;background:var(--accent-soft);color:var(--accent-hover);font-size:var(--small);line-height:1.6;text-align:start}
+.document-reader .reader-section-title{text-align:start;font-size:var(--body);color:var(--muted)}
+.document-reader .reader-field-table .reader-source-row .reader-block-heading{padding-block:8px 4px}
+
+/* 主筆記欄位：兩欄卡片，標籤在上、內容在下（測驗對照表維持原本表格） */
+.document-reader .reader-field-table:not(.reader-results-table),
+.document-reader .reader-field-table:not(.reader-results-table) tbody{display:block;inline-size:100%}
+.document-reader .reader-field-table:not(.reader-results-table) tbody{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.document-reader .reader-field-table:not(.reader-results-table) tr[data-source-block]{display:flex;flex-direction:column;gap:4px;height:auto;min-width:0;margin:0;padding:16px;border:1.5px solid var(--line);border-radius:16px;background:var(--surface)}
+.document-reader .reader-field-table:not(.reader-results-table) .reader-field-label,
+.document-reader .reader-field-table:not(.reader-results-table) .reader-field-value{display:block;inline-size:auto;width:auto;padding:0;border:0;background:transparent}
+.document-reader .reader-field-table:not(.reader-results-table) .reader-field-label{font-size:var(--small);line-height:1.6}
+.document-reader .reader-field-table:not(.reader-results-table) .reader-field-value{font-size:var(--body);line-height:1.8}
+.document-reader .reader-field-table:not(.reader-results-table) .reader-source-row{display:block;grid-column:1/-1}
+.document-reader .reader-field-table:not(.reader-results-table) .reader-source-row>td{display:block}
+
+/* 黑歷史：編號徽章與內容同一行，寬螢幕兩欄 */
+.document-reader .reader-body:has(>.reader-section-events){display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:24px;align-items:start}
+.document-reader .reader-body:has(>.reader-section-events)>.reader-section{margin:0}
+.document-reader .reader-body:has(>.reader-section-events)>.reader-section:not(.reader-section-events){grid-column:1/-1;margin-block-end:12px}
+.document-reader .reader-section-events{padding:12px 0;border-radius:0;background:transparent;border-block-end:1.5px dashed var(--line)}
+.document-reader .reader-block-event{display:flex;align-items:baseline;gap:12px;white-space:normal;font-size:var(--body);line-height:1.75}
+.reader-event-no{flex:none;min-width:2.4em;padding:0 8px;border-radius:8px;background:var(--accent-soft);color:var(--accent-hover);font-size:var(--small);font-weight:700;text-align:center;font-variant-numeric:tabular-nums;white-space:normal}
+.reader-event-text{min-width:0;overflow-wrap:anywhere}
+
+/* 18+／私人內容收合：summary 的提示字由 CSS 產生，原文欄位的文字不多一個字 */
+.reader-sensitive>summary{display:inline-flex;align-items:center;gap:8px;min-height:36px;padding:4px 12px;border-radius:999px;border:1.5px dashed var(--line-strong);color:var(--muted);font-size:var(--small);cursor:pointer;list-style:none}
+.reader-sensitive>summary::-webkit-details-marker{display:none}
+.reader-sensitive>summary::before{content:attr(data-kind) " 內容，點一下展開"}
+.reader-sensitive[open]>summary{margin-bottom:8px;border-style:solid}
+.reader-sensitive[open]>summary::before{content:attr(data-kind) " 內容，點一下收合"}
+.reader-sensitive-toggle{min-height:36px;padding:4px 12px;border-radius:999px;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);font:inherit;font-size:var(--small);white-space:nowrap;cursor:pointer}
+.reader-sensitive-toggle[aria-pressed="true"]{border-color:var(--accent);color:var(--accent-hover)}
+
+/* 窄螢幕：標題區獨占一行，按鈕和連結換到下一行，不互相擠壓 */
+@media(max-width:850px){
+  .document-reader .reader-heading{flex-wrap:wrap;align-items:flex-start}
+  .document-reader .reader-heading-title{flex:1 1 100%}
+  .document-reader .reader-heading-links{flex-wrap:wrap}
+}
+@media(max-width:600px){
+  .document-reader .reader-heading-title{flex-direction:column;align-items:flex-start;gap:8px}
+  .document-reader .reader-heading h1{font-size:32px}
+  .reader-sync-pill{white-space:normal}
+  .reader-heading-links a,.reader-heading-links summary{white-space:nowrap}
+}
+
+@media(max-width:700px){
+  .document-reader .reader-field-table:not(.reader-results-table) tbody,
+  .document-reader .reader-body:has(>.reader-section-events){grid-template-columns:minmax(0,1fr)}
+}

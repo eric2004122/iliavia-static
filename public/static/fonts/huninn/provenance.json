@@ -1,0 +1,18 @@
+{
+  "source": "https://github.com/justfont/Huninn/releases/download/v1.003/Huninn-Regular.ttf",
+  "license_source": "https://raw.githubusercontent.com/justfont/Huninn/v1.003/OFL.txt",
+  "original_bytes": 4688264,
+  "original_sha256": "6f2b79de0ee013f260fc88b4c668969e34fdfe87b7daeecaeeb5ad5a97eb9883",
+  "filename": "Huninn-Regular-9cba1ac08d23.woff",
+  "bytes": 2815472,
+  "sha256": "9cba1ac08d23401fda39e406866bff128dd039235db977ec59d53153756c627f",
+  "family": "Huninn",
+  "version": "Version 1.003",
+  "weight": 400,
+  "glyph_count": 11364,
+  "missing_characters": [
+    "樆"
+  ],
+  "conversion": "Full TTF to WOFF container conversion; glyphs were not subsetted or redrawn",
+  "fonttools_version": "4.56.0"
+}

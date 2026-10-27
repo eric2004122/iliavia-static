@@ -1,0 +1,63 @@
+/* 首頁：封面稱號、快速認識、最近更新／隨機抽，以及縮小的分頁卡片；沿用 cards.css 的色票。
+   字級只用 --small(14) / --body(16) / --lead(20) / 28 / 40。 */
+.home-aliases{list-style:none;margin:0 0 8px;padding:0;display:flex;flex-wrap:wrap;gap:8px}
+.home-aliases li{padding:4px 12px;border-radius:999px;background:var(--surface);font-size:var(--small);box-shadow:var(--card-shadow)}
+.home-aliases li:nth-child(odd){background:var(--accent-soft)}
+.home-aliases .home-aliases-more{background:transparent;box-shadow:none;padding-inline:4px}
+.home-aliases-more a{color:var(--accent-hover)}
+
+.home-quick,.home-pair{margin-top:48px}
+.home-quick .section-heading{display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:8px}
+.home-quick-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr)) minmax(0,1.4fr);gap:16px}
+.home-quick-card{display:flex;flex-direction:column;gap:8px;background:var(--surface);border-radius:var(--card-radius);box-shadow:var(--card-shadow);padding:20px;min-width:0}
+.home-quick-card strong{font-size:var(--lead);font-weight:400;color:var(--accent);line-height:1.4;overflow-wrap:anywhere}
+.home-quick-label{font-size:var(--small);color:var(--muted)}
+.home-chips{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:8px}
+.home-chips li{padding:2px 12px;border-radius:999px;background:var(--gold-soft);font-size:var(--small)}
+.home-quote{background:var(--pink-card)}
+.home-quote-text{margin:0;font-size:28px;line-height:1.35;min-height:2.7em;display:flex;align-items:center}
+.home-quote-text::before{content:"「";color:var(--accent)}
+.home-quote-text::after{content:"」";color:var(--accent)}
+.home-quote .button{align-self:flex-start}
+/* 抽到新的一句：平常是輕微放大，減少動態時改成淡入，回饋還在但不位移 */
+.home-quote-text.is-popping{animation:home-pop .3s ease-out}
+@keyframes home-pop{from{transform:scale(.95)}to{transform:scale(1)}}
+@keyframes home-fade{from{opacity:.35}to{opacity:1}}
+
+.home-pair{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:20px;align-items:start}
+.home-panel{background:var(--surface);border-radius:var(--card-radius);box-shadow:var(--card-shadow);padding:24px;min-width:0}
+.home-panel h2{font-size:var(--lead);margin:0 0 12px}
+.home-changes{list-style:none;margin:0 0 16px;padding:0;display:grid}
+.home-changes li{display:flex;flex-direction:column;gap:4px;padding:12px 0;border-bottom:1.5px dashed var(--line)}
+.home-changes a{font-size:var(--body);color:var(--ink)}
+.home-changes span{font-size:var(--small);color:var(--muted)}
+.home-pick{background:var(--gold-card)}
+.home-pick-image{display:block;border-radius:16px;overflow:hidden;background:var(--surface)}
+.home-pick-image img{display:block;width:100%;height:auto;max-height:340px;object-fit:contain}
+.home-pick-label{margin:12px 0 4px;font-size:var(--small);color:var(--ink)}
+.home-pick-text{margin:0;font-size:var(--lead);line-height:1.5}
+.home-pick-text a{color:var(--accent-hover)}
+.home-pick-hint{margin:12px 0 0;font-size:var(--small);color:var(--ink)}
+
+/* 分頁卡片改成三欄小卡，數量放大 */
+body[data-route="public.home"] .document-home-tabs{grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+body[data-route="public.home"] .document-home-tab{padding:24px;gap:12px}
+body[data-route="public.home"] .document-home-tab h3{font-size:var(--lead);line-height:1.45}
+body[data-route="public.home"] .document-home-tab>p{font-size:var(--body);line-height:1.7;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+body[data-route="public.home"] .document-home-tab>p.home-tab-count{font-size:var(--body);color:var(--muted);display:block}
+.home-tab-count strong{font-size:40px;line-height:1.1;color:var(--accent);font-weight:400;margin-right:4px;font-variant-numeric:tabular-nums}
+
+@media (max-width:1000px){
+  .home-quick-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  body[data-route="public.home"] .document-home-tabs{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media (max-width:720px){
+  .home-pair{grid-template-columns:minmax(0,1fr)}
+}
+@media (max-width:560px){
+  .home-quick,.home-pair{margin-top:32px}
+  .home-quick-grid{grid-template-columns:minmax(0,1fr)}
+  body[data-route="public.home"] .document-home-tabs{grid-template-columns:minmax(0,1fr)}
+  .home-quote-text{font-size:24px}
+}
+@media (prefers-reduced-motion:reduce){.home-quote-text.is-popping{animation:home-fade .25s ease-out}}

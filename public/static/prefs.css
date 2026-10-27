@@ -1,0 +1,45 @@
+/* 讀者閱讀設定：prefs.js 把選擇寫在 <html> 的 data-* 上，這裡依此調整。
+   網站原本的字級多用 px，所以文字大小用 zoom 把主要內容整塊放大縮小。 */
+html[data-font-size="small"] #main{zoom:.92}
+html[data-font-size="large"] #main{zoom:1.12}
+html[data-font-size="xlarge"] #main{zoom:1.25}
+
+/* 減少動態：拿掉位移、縮放、傾斜和換頁效果；
+   淡入淡出這類狀態回饋保留（例如抽到新口頭禪時的淡入），讓人還看得出畫面有變 */
+html[data-motion="reduce"],
+html[data-motion="reduce"] *{scroll-behavior:auto!important}
+html[data-motion="reduce"]::view-transition-group(*),
+html[data-motion="reduce"]::view-transition-old(*),
+html[data-motion="reduce"]::view-transition-new(*){animation:none!important}
+html[data-motion="reduce"] .profile-bubble.is-popping{animation:profile-fade .25s ease-out}
+html[data-motion="reduce"] .home-quote-text.is-popping{animation:home-fade .25s ease-out}
+html[data-motion="reduce"] :is(.profile-aliases li,.profile-card,.profile-cheer figure,.profile-stamp){transform:none}
+html[data-motion="reduce"] :is(a.profile-stream,.document-home-tab,.entry-card,.button,.cover-actions .text-link):is(:hover,:active){transform:none}
+
+/* 頁首的齒輪入口（SVG 圖示，跟著文字顏色） */
+.site-header .header-inner{position:relative}
+.site-header .main-nav{margin-left:auto}
+.site-header .prefs-link{flex:none;display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;border-radius:12px;color:var(--ink);text-decoration:none}
+.site-header .prefs-link:hover{background:var(--gold-soft)}
+.site-header .prefs-link[aria-current]{background:var(--accent);color:var(--surface)}
+.prefs-icon{display:block}
+@media(max-width:600px){
+  .site-header .prefs-link{position:absolute;top:8px;right:8px;width:44px;height:44px}
+  .site-header .brand{padding-right:48px}
+}
+
+/* 閱讀設定頁；字級只用 --small(14) / --body(16) / --lead(20) */
+.prefs-form{display:grid;gap:20px;margin-top:8px}
+.prefs-group{margin:0;border:0;min-width:0}
+.prefs-group legend{float:left;width:100%;font-size:var(--lead);font-weight:700;padding:0;margin-bottom:12px}
+.prefs-group>div{clear:both}
+/* 有些區塊是黃底，說明字用正常墨色，不用灰字 */
+.prefs-group .field-help{color:var(--ink)}
+.prefs-options{display:flex;flex-wrap:wrap;gap:8px}
+.prefs-options label{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:8px 16px;border-radius:999px;border:1.5px solid var(--line);background:var(--surface);cursor:pointer;font-size:var(--body);white-space:nowrap}
+.prefs-options label:has(input:checked){border-color:var(--accent);background:var(--accent-soft);color:var(--accent-hover);font-weight:700}
+/* 網站對 input 有統一的大框樣式，單選鈕要還原成原本的小圓點 */
+.prefs-form .prefs-options input[type="radio"]{appearance:auto;-webkit-appearance:radio;flex:none;width:18px;height:18px;min-width:0;min-height:0;margin:0;padding:0;border:0;border-radius:50%;box-shadow:none;background:none;accent-color:var(--accent)}
+.prefs-preview{margin:16px 0 0;padding:12px 16px;border-radius:16px;background:var(--gold-soft)}
+.prefs-actions{display:flex;flex-wrap:wrap;align-items:center;gap:12px 20px}
+.prefs-status{margin:0;font-size:var(--small);color:var(--muted)}

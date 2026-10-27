@@ -1,0 +1,49 @@
+/* Huninn 1.003 by the Huninn Project Authors, SIL OFL 1.1.
+   Self-hosted full character set. See fonts/huninn/OFL.txt and provenance.json. */
+@font-face{
+  font-family:"Huninn";
+  src:url("fonts/huninn/Huninn-Regular-9cba1ac08d23.woff") format("woff");
+  font-style:normal;
+  font-weight:400;
+  font-display:swap;
+}
+:root{
+  --sans:"Huninn","Microsoft JhengHei","PingFang TC",system-ui,sans-serif;
+  --portrait-mat:#fffafc;
+  --portrait-edge:#f0b5cd;
+  --portrait-frame-shadow:0 10px 24px -18px rgb(139 44 88 / .4);
+}
+body{font-kerning:normal}
+h1,h2,h3{font-weight:700;letter-spacing:0;line-height:1.4}
+.brand strong,.footer-brand{letter-spacing:-.015em;font-weight:700}
+.cover-copy h1{letter-spacing:-.025em;line-height:1.08;font-weight:700}
+.cover-description{line-height:1.75}
+.article-summary{line-height:1.8}
+.card-copy h3{line-height:1.55}
+.main-nav a,.button,label{letter-spacing:0}
+/* The rounded mat finishes the outside edge without clipping the source image.
+   The original bottom-left corner remains visible; no mask or pixel edit is used. */
+.portrait-frame{
+  width:min(100%,424px);
+  min-width:0;
+  margin-inline:auto;
+  padding:10px;
+  border:2px solid var(--portrait-edge);
+  border-radius:26px;
+  background:var(--portrait-mat);
+  box-shadow:var(--portrait-frame-shadow);
+}
+.cover-portrait .portrait-frame img{
+  display:block;
+  width:100%;
+  height:auto;
+  max-height:none;
+  object-fit:contain;
+  border-radius:0;
+  flex:none;
+}
+@media(max-width:700px){
+  .cover-copy h1{line-height:1.12}
+  .brand strong{font-size:24px}
+  .portrait-frame{padding:8px;border-radius:22px}
+}

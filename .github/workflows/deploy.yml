@@ -1,0 +1,72 @@
+# 讀取 Google 共編文件 → 產生靜態網站 → 發布到 Cloudflare Pages。
+# 觸發：推送到 main、每小時排程、或在 GitHub「Actions」頁面手動執行（Run workflow）。
+# 排程時只有內容真的變了才重新發布；推送和手動執行一律發布。
+# 需要的設定（GitHub repo → Settings → Secrets and variables → Actions）：
+#   Secrets：CLOUDFLARE_API_TOKEN、CLOUDFLARE_ACCOUNT_ID
+#   Variables（選填）：CF_PAGES_PROJECT（預設 iliavia）、SEARCH_INDEXING、CONTACT_EMAIL、SITE_URL
+name: 更新並發布網站
+
+on:
+  push:
+    branches: [main]
+  schedule:
+    # GitHub 用 UTC；每小時第 17 分檢查一次（尖峰時段可能延遲幾分鐘）
+    - cron: '17 * * * *'
+  workflow_dispatch:
+
+concurrency:
+  group: deploy
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      SEARCH_INDEXING: ${{ vars.SEARCH_INDEXING }}
+      CONTACT_EMAIL: ${{ vars.CONTACT_EMAIL }}
+      SITE_URL: ${{ vars.SITE_URL }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - run: npm test
+
+      - name: 取回上一次的內容與原圖
+        uses: actions/cache/restore@v4
+        with:
+          path: .state
+          key: state-${{ github.run_id }}
+          restore-keys: state-
+
+      - name: 讀取 Google 文件並產生網站
+        id: build
+        run: node build.mjs
+
+      - name: 發布到 Cloudflare Pages
+        if: steps.build.outputs.changed == 'true' || github.event_name != 'schedule'
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          PROJECT: ${{ vars.CF_PAGES_PROJECT || 'iliavia' }}
+        run: |
+          # 第一次發布時建立 Pages 專案；已經存在就略過
+          npx --yes wrangler@4.92.0 pages project create "$PROJECT" --production-branch main || true
+          npx --yes wrangler@4.92.0 pages deploy dist --project-name "$PROJECT" --branch main --commit-dirty=true
+
+      # 發布成功才保存，下一次才會拿這次的內容比對
+      - name: 保存這次的內容與原圖
+        if: steps.build.outputs.changed == 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: .state
+          key: state-${{ github.run_id }}

@@ -1,0 +1,18 @@
+{
+  "name": "iliavia-static",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "build": "node build.mjs",
+    "build:offline": "node build.mjs --offline",
+    "test": "node --test tests/build.test.mjs",
+    "preview": "node scripts/preview.mjs"
+  },
+  "dependencies": {
+    "htmlparser2": "10.0.0"
+  }
+}
