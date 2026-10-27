@@ -1,5 +1,5 @@
 # 讀取 Google 共編文件 → 產生靜態網站 → 發布到 GitHub Pages。
-# 觸發：推送到 main、每小時排程、或在 GitHub「Actions」頁面手動執行（Run workflow）。
+# 觸發：推送到 main、每 15 分鐘排程、或在 GitHub「Actions」頁面手動執行（Run workflow）。
 # 排程時只有內容真的變了才重新發布；推送和手動執行一律發布。
 # 第一次要到 repo → Settings → Pages，把 Source 設成「GitHub Actions」。
 # Variables（選填，repo → Settings → Secrets and variables → Actions → Variables）：
@@ -10,8 +10,9 @@ on:
   push:
     branches: [main]
   schedule:
-    # GitHub 用 UTC；每小時第 17 分檢查一次（尖峰時段可能延遲幾分鐘）
-    - cron: '17 * * * *'
+    # 每 15 分鐘檢查一次；避開整點，GitHub 尖峰時段仍可能延遲幾分鐘
+    # 改頻率時，src/views.mjs 裡的「約每 15 分鐘」也要一起改
+    - cron: '2,17,32,47 * * * *'
   workflow_dispatch:
 
 concurrency:
