@@ -10,6 +10,7 @@ import {build} from '../build.mjs';
 import {TABS,PRIMARY_TAB,HISTORY_TAB,MEMES_TAB} from '../src/catalog.mjs';
 import {SourceError,allowedRedirect} from '../src/source.mjs';
 import {buildProfile,splitList,sensitiveKind} from '../src/profile.mjs';
+import {imageSize} from '../src/image-size.mjs';
 const ROOT=join(dirname(fileURLToPath(import.meta.url)),'..');
 
 // 1×1 PNG（合成）
@@ -44,6 +45,9 @@ test('builds every page, keeps source text exactly and copies original images',a
     assert.equal(readdirSync(join(w.outDir,'images')).length,1);
     const primary=read(w,`document/${PRIMARY_TAB}/index.html`);
     assert.ok(primary.includes('<details class="reader-sensitive" data-sensitive><summary data-kind="18+"'));assert.ok(primary.includes('src="/images/'));assert.ok(primary.indexOf('reader-search.js')<primary.indexOf('/static/reader.js'));
+    // 圖片先標好寬高、有編號角標；介紹頁開頭有立繪與分區跳轉
+    assert.match(primary,/<img src="\/images\/[a-f0-9]{64}\.png" alt="[^"]+" width="1" height="1"/);assert.ok(primary.includes('class="reader-image-no"'));
+    const profilePage=read(w,'profile/index.html');assert.ok(profilePage.includes('class="profile-portrait"'));assert.ok(profilePage.includes('<nav class="profile-jump" aria-label="介紹分區"><a href="#profile-stats-title">資料</a>'));
     assert.ok(read(w,`document/${HISTORY_TAB}/index.html`).includes('<span class="reader-event-no">\t1</span><span class="reader-event-text">\n\t第一件測試事\n</span>'));
     assert.ok(read(w,'document/index.html').includes('data-document-index'));
     const home=read(w,'index.html');for(const part of ['快速認識','home-tab-count','最近更新','data-home-pick','href="/profile/"'])assert.ok(home.includes(part),part);
@@ -110,6 +114,14 @@ test('source text failure throws and leaves the previous state untouched',async(
 test('only fixed Google export URLs are followed',()=>{
   const good='https://doc-14-4o-docstext.googleusercontent.com/export/opaque?format=txt&tab='+PRIMARY_TAB;assert.equal(allowedRedirect(new URL(good),PRIMARY_TAB,'txt'),true);
   for(const bad of [good.replace('.com/','.com.evil.test/'),good.replace(PRIMARY_TAB,'t.0'),good.replace('https:','http:')])assert.equal(allowedRedirect(new URL(bad),PRIMARY_TAB,'txt'),false);
+});
+test('image sizes are read from PNG, GIF, JPEG and WebP headers without changing the bytes',()=>{
+  const bytes=s=>Uint8Array.from(Buffer.from(s,'base64'));
+  assert.deepEqual(imageSize(bytes(PNG)),[1,1]);
+  assert.deepEqual(imageSize(Uint8Array.from([71,73,70,56,57,97,3,0,2,0,0,0,0,59])),[3,2]);
+  const jpeg=Uint8Array.from([0xff,0xd8,0xff,0xe0,0,4,0,0,0xff,0xc0,0,11,8,0,5,0,7,1,1,0x11,0,0xff,0xd9]);assert.deepEqual(imageSize(jpeg),[7,5]);
+  const webp=new Uint8Array(30);webp.set([...Buffer.from('RIFF')],0);webp.set([...Buffer.from('WEBPVP8X')],8);webp.set([9,0,0,4,0,0],24);assert.deepEqual(imageSize(webp),[10,5]);
+  assert.equal(imageSize(Uint8Array.from([1,2,3])),null);
 });
 test('profile cards split lists outside brackets and know which fields are sensitive',()=>{
   assert.deepEqual(splitList('甲、乙（含、頓號）、丙'),['甲','乙（含、頓號）','丙']);

@@ -8,6 +8,17 @@
 .profile-aliases li:nth-child(3n+1){background:var(--accent-soft);transform:rotate(-1.5deg)}
 .profile-aliases li:nth-child(3n){background:var(--gold-soft);transform:rotate(1deg)}
 .profile-card{background:var(--gold-card);border:2px solid var(--card-border);border-radius:var(--card-radius);box-shadow:var(--hero-shadow);padding:22px 24px;transform:rotate(1deg)}
+/* 右邊放首頁那張立繪（原圖、不去背），基本資料卡像貼紙一樣疊在下緣 */
+.profile-hero-side{display:grid;justify-items:center;min-width:0}
+.profile-portrait{margin:0;width:min(100%,300px);padding:12px 12px 0;border-radius:var(--hero-radius);background:var(--pink-card);box-shadow:var(--hero-shadow);transform:rotate(-1.5deg)}
+.profile-portrait img{display:block;width:100%;height:auto}
+.profile-hero-side .profile-card{position:relative;width:min(100%,380px);margin-top:-72px}
+
+/* 頁內跳轉：跟著頁首一起固定，點了直接到該區 */
+.profile-jump{position:sticky;top:calc(var(--shell-offset,112px) - 8px);z-index:5;display:flex;gap:8px;overflow-x:auto;margin:8px 0 0;padding:8px;border-radius:999px;background:var(--glass-paper);box-shadow:var(--card-shadow);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);scrollbar-width:none}
+.profile-jump a{flex:none;display:inline-flex;align-items:center;min-height:44px;padding:6px 18px;border-radius:999px;color:var(--ink);text-decoration:none;white-space:nowrap}
+.profile-jump a:hover{background:var(--gold-soft)}
+.profile-section h2{scroll-margin-top:72px}
 .profile-card h2{margin:0 0 12px;font-size:var(--lead)}
 .profile-card dl{margin:0;display:grid;grid-template-columns:auto minmax(0,1fr);gap:8px 16px}
 .profile-card dt{color:var(--muted);font-size:var(--small)}
@@ -75,7 +86,7 @@
 .profile-bubble.is-popping{animation:profile-pop .3s ease-out}
 @keyframes profile-pop{from{transform:scale(.95)}to{transform:scale(1)}}
 @keyframes profile-fade{from{opacity:.35}to{opacity:1}}
-@media (prefers-reduced-motion:reduce){.profile-bubble.is-popping{animation:profile-fade .25s ease-out}.profile-aliases li,.profile-card,.profile-cheer figure{transform:none}}
+@media (prefers-reduced-motion:reduce){.profile-bubble.is-popping{animation:profile-fade .25s ease-out}.profile-aliases li,.profile-card,.profile-cheer figure,.profile-portrait{transform:none}}
 
 .profile-saying{margin:0;background:var(--surface);border:2px solid var(--line);border-radius:var(--card-radius);box-shadow:var(--card-shadow);padding:20px 22px}
 .profile-saying p{margin:0 0 10px;font-size:var(--lead)}
@@ -128,6 +139,8 @@ a.profile-stream:hover{border-color:var(--accent)}
 @media (max-width:860px){
   .profile-hero{grid-template-columns:minmax(0,1fr)}
   .profile-card{transform:none}
+  .profile-portrait{width:min(62%,240px)}
+  .profile-hero-side .profile-card{margin-top:-48px}
 }
 @media (max-width:560px){
   .profile-quote-stage{grid-template-columns:minmax(0,1fr)}

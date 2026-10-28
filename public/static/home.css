@@ -15,6 +15,8 @@
 .home-chips{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:8px}
 .home-chips li{padding:2px 12px;border-radius:999px;background:var(--gold-soft);font-size:var(--small)}
 .home-quote{background:var(--pink-card)}
+/* 粉紅底上灰字對比不夠，改用文字色 */
+.home-quote .home-quick-label{color:var(--ink)}
 .home-quote-text{margin:0;font-size:28px;line-height:1.35;min-height:2.7em;display:flex;align-items:center}
 .home-quote-text::before{content:"「";color:var(--accent)}
 .home-quote-text::after{content:"」";color:var(--accent)}
@@ -53,6 +55,12 @@ body[data-route="public.home"] .document-home-tab>p.home-tab-count{font-size:var
 }
 @media (max-width:720px){
   .home-pair{grid-template-columns:minmax(0,1fr)}
+}
+/* 手機：立繪移到最前面、縮小但保留完整比例，第一個畫面就看得到她 */
+@media (max-width:600px){
+  body[data-route="public.home"] .cover-portrait{order:-1;padding-top:14px}
+  body[data-route="public.home"] .cover-portrait .portrait-frame{width:min(64%,260px)}
+  body[data-route="public.home"] .cover-portrait figcaption{min-height:44px}
 }
 @media (max-width:560px){
   .home-quick,.home-pair{margin-top:32px}

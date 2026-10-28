@@ -21,7 +21,8 @@
 .reader-directory nav a[data-count]{gap:8px}
 .reader-tab-chips{display:none}
 @media(max-width:850px){
-  .reader-tab-chips{display:flex;gap:8px;margin:0 0 16px;padding:4px 0 8px;overflow-x:auto;overscroll-behavior-x:contain;scroll-snap-type:x proximity;scroll-padding-inline:16px;scrollbar-width:thin;scrollbar-color:var(--line-strong) transparent}
+  /* 右緣淡出，看得出還能往右滑；最後一個標籤仍滑得到完整位置 */
+  .reader-tab-chips{display:flex;gap:8px;margin:0 0 16px;padding:4px 32px 8px 0;overflow-x:auto;overscroll-behavior-x:contain;scroll-snap-type:x proximity;scroll-padding-inline:16px;scrollbar-width:thin;scrollbar-color:var(--line-strong) transparent;-webkit-mask-image:linear-gradient(to right,#000 calc(100% - 40px),transparent);mask-image:linear-gradient(to right,#000 calc(100% - 40px),transparent)}
   .reader-tab-chips a{flex:none;display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:8px 16px;border-radius:999px;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);font-size:var(--small);text-decoration:none;white-space:nowrap;scroll-snap-align:start}
   .reader-tab-chips a[aria-current]{border-color:var(--accent);background:var(--accent);color:var(--surface);font-weight:700}
   .reader-tab-chips a[aria-current]::after{background:var(--reader-on-accent);color:var(--surface)}
@@ -36,9 +37,9 @@
 .document-reader .reader-tools>summary{padding-inline:0;min-height:44px}
 .document-reader .reader-tools-content{padding-inline:0}
 
-/* 原文裡的裝飾標題（♡₍ᐢ.ˬ.ᐢ₎ 等）：文字照留，改成靠左的小標籤 */
+/* 原文裡的裝飾標題（♡₍ᐢ.ˬ.ᐢ₎ 等）：文字照留，放大成段落標題，底下一道粉色螢光筆 */
 .document-reader .reader-block-heading{text-align:start}
-.document-reader .reader-block-heading h3{display:inline-block;padding:4px 16px;border-radius:999px;background:var(--accent-soft);color:var(--accent-hover);font-size:var(--small);line-height:1.6;text-align:start}
+.document-reader .reader-block-heading h3{display:inline;padding:0 4px;border-radius:0;background:linear-gradient(transparent 60%,var(--pink) 60%);-webkit-box-decoration-break:clone;box-decoration-break:clone;color:var(--ink);font-size:22px;line-height:1.7;text-align:start}
 .document-reader .reader-section-title{text-align:start;font-size:var(--body);color:var(--muted)}
 .document-reader .reader-field-table .reader-source-row .reader-block-heading{padding-block:8px 4px}
 
@@ -59,9 +60,19 @@
 .document-reader .reader-body:has(>.reader-section-events)>.reader-section{margin:0}
 .document-reader .reader-body:has(>.reader-section-events)>.reader-section:not(.reader-section-events){grid-column:1/-1;margin-block-end:12px}
 .document-reader .reader-section-events{padding:12px 0;border-radius:0;background:transparent;border-block-end:1.5px dashed var(--line)}
-.document-reader .reader-block-event{display:flex;align-items:baseline;gap:12px;white-space:normal;font-size:var(--body);line-height:1.75}
-.reader-event-no{flex:none;min-width:2.4em;padding:0 8px;border-radius:8px;background:var(--accent-soft);color:var(--accent-hover);font-size:var(--small);font-weight:700;text-align:center;font-variant-numeric:tabular-nums;white-space:normal}
+.document-reader .reader-block-event{display:flex;align-items:baseline;gap:14px;white-space:normal;font-size:var(--body);line-height:1.75}
+/* 編號是黑歷史的節奏：大號粉紅數字、固定寬度，內容靠齊 */
+.reader-event-no{flex:none;inline-size:2.2em;color:var(--accent);font-size:26px;line-height:1.1;text-align:end;font-variant-numeric:tabular-nums;white-space:normal}
 .reader-event-text{min-width:0;overflow-wrap:anywhere}
+
+/* 文件圖片：依原比例排成瀑布流，不裁切、不留白邊；每張只在角落放一個小編號，原圖從放大視窗另開 */
+.document-reader .reader-gallery{display:block;columns:3 220px;column-gap:16px}
+.document-reader .reader-image-card{position:relative;break-inside:avoid;margin:0 0 16px;padding:6px;border:2px solid var(--line);border-radius:18px;background:var(--surface);box-shadow:var(--card-shadow)}
+.document-reader .reader-image-original{aspect-ratio:auto;background:transparent;border-radius:12px;overflow:hidden}
+.document-reader .reader-image-original img{position:static;inline-size:100%;block-size:auto;width:100%;height:auto;max-block-size:none;object-fit:fill}
+.document-reader .reader-image-card figcaption.reader-image-no{position:absolute;top:12px;left:12px;min-block-size:0;padding:0 10px;border-radius:999px;background:rgb(255 255 255 / .92);color:var(--ink);font-size:var(--small);line-height:1.7;font-variant-numeric:tabular-nums;pointer-events:none}
+.document-reader .reader-gallery:has(>.reader-image-card:only-child){columns:auto}
+.document-reader .reader-gallery>.reader-image-card:only-child{inline-size:min(100%,28rem);margin-inline:auto}
 
 /* 18+／私人內容收合：summary 的提示字由 CSS 產生，原文欄位的文字不多一個字 */
 .reader-sensitive>summary{display:inline-flex;align-items:center;gap:8px;min-height:36px;padding:4px 12px;border-radius:999px;border:1.5px dashed var(--line-strong);color:var(--muted);font-size:var(--small);cursor:pointer;list-style:none}
@@ -79,6 +90,11 @@
   .document-reader .reader-heading-links{flex-wrap:wrap}
 }
 @media(max-width:600px){
+  .document-reader .reader-gallery{columns:2 130px;column-gap:10px}
+  .document-reader .reader-image-card{margin-bottom:10px;padding:4px;border-radius:14px}
+  .document-reader .reader-image-card figcaption.reader-image-no{top:8px;left:8px;padding:0 8px}
+  .document-reader .reader-block-heading h3{font-size:19px}
+  .reader-event-no{font-size:22px}
   .document-reader .reader-heading-title{flex-direction:column;align-items:flex-start;gap:8px}
   .document-reader .reader-heading h1{font-size:32px}
   .reader-sync-pill{white-space:normal}

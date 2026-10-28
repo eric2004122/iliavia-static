@@ -18,7 +18,10 @@
       var pick = picks[Math.floor(Math.random() * picks.length)];
       if (pick.kind === "meme") {
         var link = make("a", { className: "home-pick-image", href: pick.url, target: "_blank", rel: "noopener" });
-        link.append(make("img", { src: pick.url, alt: pick.alt, loading: "lazy" }));
+        var image = make("img", { src: pick.url, alt: pick.alt, loading: "lazy" });
+        // 先給寬高，圖片載入前就預留好位置
+        if (Array.isArray(pick.size)) { image.width = pick.size[0]; image.height = pick.size[1]; }
+        link.append(image);
         slot.replaceChildren(link, make("p", { className: "home-pick-label" }, "來自「鼠兔各種梗圖」"));
       } else {
         var text = make("p", { className: "home-pick-text" });

@@ -143,12 +143,12 @@ input:focus,select:focus,textarea:focus{border-color:var(--accent)}
   :root{--shell-offset:132px}
   .container{width:calc(100% - 32px)}
   .site-header{padding-block:8px}
-  .header-inner{min-height:0;padding:12px 16px;gap:6px;align-items:stretch;border-radius:20px}
+  .header-inner{min-height:0;padding:8px 12px;gap:0;align-items:stretch;border-radius:20px}
   .brand{gap:0}
   .brand strong{font-size:clamp(19px,5.4vw,23px);line-height:1.4;white-space:nowrap}
   .brand>span{display:none}
   .main-nav{gap:8px;justify-content:flex-end;font-size:14px;width:100%}
-  .main-nav a{min-height:44px;padding:8px 16px}
+  .main-nav a{min-height:44px;padding:6px 12px}
   #main{padding-top:12px;padding-bottom:36px}
   .notebook-cover{gap:18px}
   .cover-copy{padding:32px 24px}

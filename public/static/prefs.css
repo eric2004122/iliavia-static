@@ -13,7 +13,7 @@ html[data-motion="reduce"]::view-transition-old(*),
 html[data-motion="reduce"]::view-transition-new(*){animation:none!important}
 html[data-motion="reduce"] .profile-bubble.is-popping{animation:profile-fade .25s ease-out}
 html[data-motion="reduce"] .home-quote-text.is-popping{animation:home-fade .25s ease-out}
-html[data-motion="reduce"] :is(.profile-aliases li,.profile-card,.profile-cheer figure,.profile-stamp){transform:none}
+html[data-motion="reduce"] :is(.profile-aliases li,.profile-card,.profile-cheer figure,.profile-stamp,.profile-portrait){transform:none}
 html[data-motion="reduce"] :is(a.profile-stream,.document-home-tab,.entry-card,.button,.cover-actions .text-link):is(:hover,:active){transform:none}
 
 /* 頁首的齒輪入口（SVG 圖示，跟著文字顏色） */

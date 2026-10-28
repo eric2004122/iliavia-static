@@ -1,10 +1,11 @@
 // 把 .state/ 的內容寫成 dist/ 靜態網站：網頁、原圖、瀏覽器端要用的 JSON。發布到 GitHub Pages。
-import {rm,mkdir,cp,writeFile,copyFile,access} from 'node:fs/promises';
+import {rm,mkdir,cp,writeFile,copyFile,access,readFile} from 'node:fs/promises';
 import {join,dirname} from 'node:path';
 import {TABS,MEMES_TAB} from './catalog.mjs';
 import {searchableText} from './presentation.mjs';
 import {buildProfile,tabCounts,homePick,changeSummary,imageAlt,imageUrl} from './profile.mjs';
 import {documentVersion} from './state.mjs';
+import {imageSize} from './image-size.mjs';
 import * as view from './views.mjs';
 
 // 網站設定只用環境變數（GitHub Actions 的 Variables）：
@@ -25,6 +26,13 @@ export async function writeSite(state,{outDir,stateDir,publicDir,env={},log=()=>
   const opts=siteOptions(env),base=opts.base,at=path=>base+path.replace(/^\//,'');
   const tabs=TABS.flatMap(t=>{const s=state.tabs.find(x=>x.tab_id===t.id);return s?[{...s,title:t.title}]:[];});
   if(!tabs.length)throw new Error('還沒有任何分頁內容，無法產生網站。');
+  // 原圖寬高：給 <img> 的 width／height，版面先預留位置
+  const files=[...new Set(tabs.flatMap(t=>t.attachments.map(a=>a.file)))],available=[];
+  opts.sizes=new Map();
+  for(const file of files){
+    if(!await exists(join(stateDir,file))){log(`找不到原圖 ${file}，這張圖這次不會顯示。`);continue;}
+    available.push(file);const size=imageSize(await readFile(join(stateDir,file)));if(size)opts.sizes.set(file,size);
+  }
   await rm(outDir,{recursive:true,force:true});
   await cp(publicDir,outDir,{recursive:true});
   const page=async(path,html)=>{const file=join(outDir,path,'index.html');await mkdir(dirname(file),{recursive:true});await writeFile(file,withBase(html,base));};
@@ -44,10 +52,7 @@ export async function writeSite(state,{outDir,stateDir,publicDir,env={},log=()=>
 
   // 原圖：只放目前分頁用到的
   await mkdir(join(outDir,'images'),{recursive:true});
-  for(const file of new Set(tabs.flatMap(t=>t.attachments.map(a=>a.file)))){
-    if(await exists(join(stateDir,file)))await copyFile(join(stateDir,file),join(outDir,file));
-    else log(`找不到原圖 ${file}，這張圖這次不會顯示。`);
-  }
+  for(const file of available)await copyFile(join(stateDir,file),join(outDir,file));
 
   // 瀏覽器端用的資料：版本（有新內容提示）、搜尋文字、口頭禪、隨機抽
   await mkdir(join(outDir,'data'),{recursive:true});
@@ -55,7 +60,7 @@ export async function writeSite(state,{outDir,stateDir,publicDir,env={},log=()=>
   await json('state.json',{available:true,version,last_success:updatedAt});
   await json('search.json',{tabs:tabs.map(t=>({id:t.tab_id,title:t.title,path:at(view.tabPath(t.tab_id)),text:searchableText(t.body,t.tab_id,t.title)}))});
   await json('quotes.json',data.profile?.quotes||[]);
-  await json('picks.json',[...data.memes.assets.map((asset,i)=>({kind:'meme',url:at(imageUrl(MEMES_TAB,asset)),alt:imageAlt(asset,i+1)})),...data.history.events.filter(e=>!e.milestone).map(e=>({kind:'history',number:e.number,text:e.text,url:e.url}))]);
+  await json('picks.json',[...data.memes.assets.map((asset,i)=>({kind:'meme',url:at(imageUrl(MEMES_TAB,asset)),alt:imageAlt(asset,i+1),size:opts.sizes.get(asset.file)||null})),...data.history.events.filter(e=>!e.milestone).map(e=>({kind:'history',number:e.number,text:e.text,url:e.url}))]);
 
   const pages=['/','/profile/','/document/',...tabs.map(t=>view.tabPath(t.tab_id)),'/about/'].map(at);
   await writeFile(join(outDir,'robots.txt'),opts.searchIndexing?`User-agent: *\nDisallow: ${at('/data/')}\n${opts.siteUrl?`Sitemap: ${opts.siteUrl}${at('/sitemap.xml')}\n`:''}`:'User-agent: *\nDisallow: /\n');
