@@ -66,6 +66,8 @@ function profile(tab){
     school:['沒拿到的學分','持有證照'].filter(label=>lines(label).length).map(label=>({label,lines:lines(label)})),
     court:{note:court.find(l=>l.startsWith('【')&&l.includes('原告們'))||'',plaintiffs:splitList(court.find(l=>!l.startsWith('【'))||'')},
     cheer:{asset:tab.attachments[0]||null,caption:list.flatMap(c=>c||[]).find(l=>/^[（(].+[)）]$/u.test(l))||''},
+    // 介紹頁還不認得的欄位（文件新增的「♡ …」）：照原文放進「其他」，不會漏掉
+    others:pairs(list).filter(([label,value])=>/^[♡❤♥]/u.test(label)&&!PROFILE_LABELS.has(normalize(label))&&value.length).map(([label,value])=>({label,lines:value})),
   };
 }
 const tests=tab=>pairs(cells(tab.body)).filter(([,v])=>v.length).map(([label,v])=>{const value=v.join(' ');return {label,value,long:[...label].length>6||[...value].length>14};});

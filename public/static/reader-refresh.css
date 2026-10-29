@@ -39,6 +39,8 @@
 
 /* 原文裡的裝飾標題（♡₍ᐢ.ˬ.ᐢ₎ 等）：文字照留，放大成段落標題，底下一道粉色螢光筆 */
 .document-reader .reader-block-heading{text-align:start}
+/* 標題後面的連續空行不要跟著畫螢光筆（否則下一行會多一個粉紅小方塊）；文字仍在，只是不顯示 */
+.document-reader .reader-block-heading h3 .reader-source-space,.document-reader .reader-block-heading h3 br{display:none}
 .document-reader .reader-block-heading h3{display:inline;padding:0 4px;border-radius:0;background:linear-gradient(transparent 60%,var(--pink) 60%);-webkit-box-decoration-break:clone;box-decoration-break:clone;color:var(--ink);font-size:22px;line-height:1.7;text-align:start}
 .document-reader .reader-section-title{text-align:start;font-size:var(--body);color:var(--muted)}
 .document-reader .reader-field-table .reader-source-row .reader-block-heading{padding-block:8px 4px}

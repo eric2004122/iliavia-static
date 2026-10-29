@@ -1,4 +1,4 @@
-import {normalize,PRIMARY_TAB,TAB_PREFIXES} from './catalog.mjs';
+import {normalize,PRIMARY_TAB,STREAMS_TAB,TAB_PREFIXES} from './catalog.mjs';
 const groups={
   '基本資料':'姓名 姓名別稱 性別 種族 生日 出道日期 宗教信仰 分身 身高 UU CPU 身體數值 此筆記頭銜',
   '特徵與個性':'性格 外貌特徵 萌點 反應 聲音 身體疾病 過敏 過敏原 生理期 體能狀況',
@@ -24,6 +24,8 @@ export function units(body,tab,title) {
     if(!s) return {kind:'space'};
     if(!sectionTitle(s)&&(fields.has(n)||(tab==='t.gbcaaxqgbkej'&&tests.has(n)))) return {kind:'field',group:tab==='t.gbcaaxqgbkej'?'測驗結果':fields.get(n),label:s,split:l.end};
     if(sectionTitle(s)||/^#{1,6}\s+/.test(s)||bracketTitle(l)||(i===first&&s.length<=120&&(n===normalize(title)||s.includes('筆記')||s.includes('測驗結果')||s.includes('黑歷史')))) return {kind:'heading',heading:s.replace(/^#{1,6}\s+/, '')};
+    // 值得紀念回是兩欄表格：「感性哭哭回」這種短標籤格，下一格（Tab 開頭）是影片標題與日期，做成一張張卡片
+    if(tab===STREAMS_TAB&&s.length<=20&&!s.startsWith('【')&&lines[i+1]?.raw.startsWith('\t')&&lines[i+1].text)return {kind:'field',label:s,split:l.end,group:'值得紀念回'};
     const numbered=s.match(/^(\d{1,5})(?:[.．、)）]\s*(.*))?$/);
     if(!profile&&numbered&&(tab==='t.nzf45lbshn11'||numberCount>=2||numbered[2]))return {kind:'event',number:numbered[1],inline:numbered[2]||''};
     const inline=l.raw.match(/^[\t ]*([^:：\t\r\n]{1,24}?)([\t ]*[:：][\t ]*|\t+)(.*)/);
@@ -71,7 +73,20 @@ export function presentation(body,tab,title,query='') {
       if(section&&!section.hidden){const from=Math.max(section.start,m.index-38);matches.push({id:`match-${matches.length+1}`,start:m.index,end:m.index+m[0].length,text:m[0],section_id:section.id,snippet:body.slice(from,Math.min(section.end,m.index+m[0].length+60)),snippet_start:from});}
     }
   }
-  return {sections,matches,toc:sections.filter(s=>!s.hidden&&s.show_title!==false).map(s=>({id:s.id,title:s.title})),excerpt:excerpt(blocks,title)};
+  return {sections,matches,toc:tableOfContents(sections),excerpt:excerpt(blocks,title)};
+}
+// 頁內目錄；黑歷史這種上百條的編號清單，改成每 10 條一組（第 1–10 項…），點了跳到該組第一條
+function tableOfContents(sections){
+  const entries=sections.filter(s=>!s.hidden&&s.show_title!==false).map(s=>({id:s.id,title:s.title,number:s.kind==='events'?Number(s.blocks.find(b=>b.kind==='event')?.number):0}));
+  const events=entries.filter(e=>e.number>0);
+  if(events.length<=12)return entries.map(({id,title})=>({id,title}));
+  const groups=new Map();
+  for(const e of events){const key=Math.floor((e.number-1)/10),group=groups.get(key);if(group)group.last=Math.max(group.last,e.number);else groups.set(key,{first:e,last:e.number});}
+  return entries.flatMap(e=>{
+    if(!e.number)return [{id:e.id,title:e.title}];
+    const key=Math.floor((e.number-1)/10),group=groups.get(key);
+    return group.first===e?[{id:e.id,title:`第 ${key*10+1}–${group.last} 項`}]:[];
+  });
 }
 export function excerpt(blocks,title,max=180){
   const candidates=blocks.filter(b=>!b.hidden&&!['space','heading'].includes(b.kind)).flatMap(b=>b.raw.split(/\r?\n\s*\r?\n/)).map(s=>s.trim()).filter(s=>/[\p{L}\p{N}]/u.test(s)&&normalize(s)!==normalize(title));

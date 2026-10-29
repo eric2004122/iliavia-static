@@ -12,6 +12,7 @@ import {SourceError,allowedRedirect} from '../src/source.mjs';
 import {buildProfile,splitList,sensitiveKind} from '../src/profile.mjs';
 import {imageSize} from '../src/image-size.mjs';
 import {presentation} from '../src/presentation.mjs';
+import {documentReader,profile as profileView} from '../src/views.mjs';
 const presentationFor=(body,tab=PRIMARY_TAB)=>presentation(body,tab,TABS.find(t=>t.id===tab).title);
 const ROOT=join(dirname(fileURLToPath(import.meta.url)),'..');
 
@@ -150,6 +151,18 @@ test('decorated section titles start new sections; bracketed values and numbered
   assert.ok(p.sections.filter(s=>s.kind==='fields').every(s=>s.show_title===false));assert.ok(p.toc.every(t=>t.title.includes('₍ᐢ')));
   // 一般內容裡的【影片標題】【#標籤】不是標題
   assert.ok(presentationFor('鼠兔語錄\n測試\n\t【測試直播#3】測試【#Iliavia】\n','t.cx5wy0vc5dmy').sections.flatMap(s=>s.blocks).every(b=>b.kind!=='heading'||b.raw.startsWith('鼠兔語錄')));
+});
+test('stream labels become cards, link titles become links, history contents group by tens, unknown profile fields go to 其他',()=>{
+  const streamTab=TABS.find(t=>t.id==='t.o8zb2xicyxoo'),body='鼠兔各種值得紀念回\r\n\r\n\r\n感性測試回\r\n\t【測試直播】標題一【#Iliavia】2026年8月9日\r\n【測試直播】標題一【#Iliavia】\r\n\t傳奇測試回\r\n\t【測試直播#2】標題二【#Iliavia】2026年8月16日\r\n【測試直播#2】標題二【#Iliavia】';
+  const p=presentationFor(body,streamTab.id);assert.deepEqual(p.sections.flatMap(s=>s.blocks).filter(b=>b.kind==='field').map(b=>b.label),['感性測試回','傳奇測試回']);
+  const selected={tab_id:streamTab.id,title:streamTab.title,body,attachments:[],links:[{url:'https://www.youtube.com/watch?v=test1',label:'【測試直播】標題一【#Iliavia】'}],changed_at:new Date().toISOString(),kind:'baseline'};
+  const html=documentReader({tabs:[selected],selected,updatedAt:null,version:'x'},{});
+  assert.ok(html.includes('<a href="https://www.youtube.com/watch?v=test1" target="_blank" rel="noopener noreferrer">【測試直播】標題一【#Iliavia】</a>'));assert.equal(sourceText(html),body);
+  const history='黑歷史\n'+Array.from({length:25},(_,i)=>`\t${i+1}\n\t第 ${i+1} 件測試事\n`).join('');
+  assert.deepEqual(presentationFor(history,HISTORY_TAB).toc.map(t=>t.title),['黑歷史','第 1–10 項','第 11–20 項','第 21–25 項']);
+  const data=buildProfile([{tab_id:PRIMARY_TAB,body:BODIES[PRIMARY_TAB]+'\t♡ 喜歡的測試遊戲\n\t測試遊戲甲\n',attachments:[],links:[]}]);
+  assert.deepEqual(data.profile.others,[{label:'♡ 喜歡的測試遊戲',lines:['測試遊戲甲']}]);
+  assert.ok(profileView(data,null,{}).includes('<h3>♡ 喜歡的測試遊戲</h3><p>測試遊戲甲</p>'));
 });
 test('profile cards split lists outside brackets and know which fields are sensitive',()=>{
   assert.deepEqual(splitList('甲、乙（含、頓號）、丙'),['甲','乙（含、頓號）','丙']);
