@@ -1,6 +1,8 @@
 # 讀取 Google 共編文件 → 產生靜態網站 → 發布到 GitHub Pages。
-# 觸發：推送到 main、每 15 分鐘排程、或在 GitHub「Actions」頁面手動執行（Run workflow）。
-# 排程時只有內容真的變了才重新發布；推送和手動執行一律發布。
+# 兩種更新方式並存：
+#   自動：每 15 分鐘檢查一次，只有內容真的變了才重新發布。
+#   手動：管理員在網站的「管理員：更新網站」頁（/admin/）按「更新網站」，
+#         或在 GitHub「Actions」頁面按「Run workflow」，馬上重新讀取並發布。推送程式到 main 也會重新發布。
 # 第一次要到 repo → Settings → Pages，把 Source 設成「GitHub Actions」。
 # Variables（選填，repo → Settings → Secrets and variables → Actions → Variables）：
 #   SEARCH_INDEXING（設 1 才讓搜尋引擎收錄）、CONTACT_EMAIL、SITE_URL
@@ -51,6 +53,7 @@ jobs:
           key: state-${{ github.run_id }}
           restore-keys: state-
 
+      # GITHUB_REPOSITORY（帳號/repo）由 GitHub 自動提供，管理頁的更新按鈕要用
       - name: 讀取 Google 文件並產生網站
         id: build
         env:

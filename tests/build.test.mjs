@@ -53,7 +53,7 @@ test('builds every page, keeps source text exactly and copies original images',a
     assert.ok(read(w,`document/${HISTORY_TAB}/index.html`).includes('<span class="reader-event-no">\t1</span><span class="reader-event-text">\n\t第一件測試事\n</span>'));
     assert.ok(read(w,'document/index.html').includes('data-document-index'));
     const home=read(w,'index.html');for(const part of ['快速認識','home-tab-count','最近更新','data-home-pick','href="/profile/"'])assert.ok(home.includes(part),part);
-    const nav=home.slice(home.indexOf('class="main-nav"'));assert.ok(nav.indexOf('>介紹<')<nav.indexOf('>共編筆記<'));assert.ok(!home.includes('/admin'));
+    const nav=home.slice(home.indexOf('class="main-nav"'));assert.ok(nav.indexOf('>介紹<')<nav.indexOf('>共編筆記<'));assert.ok(!nav.slice(0,nav.indexOf('</nav>')).includes('/admin'));
     assert.ok(read(w,'profile/index.html').includes('測試乙（含、頓號）'));
     assert.deepEqual(JSON.parse(read(w,'data/quotes.json')),['測試一','測試二']);
     const search=JSON.parse(read(w,'data/search.json'));assert.equal(search.tabs.length,6);assert.ok(!search.tabs.find(t=>t.id===HISTORY_TAB).text.endsWith('3\n\t\n'));
@@ -116,6 +116,20 @@ test('source text failure throws and leaves the previous state untouched',async(
 test('only fixed Google export URLs are followed',()=>{
   const good='https://doc-14-4o-docstext.googleusercontent.com/export/opaque?format=txt&tab='+PRIMARY_TAB;assert.equal(allowedRedirect(new URL(good),PRIMARY_TAB,'txt'),true);
   for(const bad of [good.replace('.com/','.com.evil.test/'),good.replace(PRIMARY_TAB,'t.0'),good.replace('https:','http:')])assert.equal(allowedRedirect(new URL(bad),PRIMARY_TAB,'txt'),false);
+});
+test('admin update page talks only to the GitHub API, knows its repo, and stays out of search engines',async()=>{
+  const w=workspace();try{
+    await run(w,{fetcher:fakeGoogle().fetcher,env:{GITHUB_REPOSITORY:'example-user/iliavia-static',BASE_PATH:'/iliavia-static',SEARCH_INDEXING:'1'}});
+    const page=read(w,'admin/index.html');
+    assert.ok(page.includes('data-repo="example-user/iliavia-static"'));assert.ok(page.includes('data-workflow="deploy.yml"'));assert.ok(page.includes('data-state-url="/iliavia-static/data/state.json"'));
+    assert.ok(page.includes("connect-src 'self' https://api.github.com;"));assert.ok(page.includes('/iliavia-static/static/update.js'));assert.ok(page.includes('<meta name="robots" content="noindex'));
+    // 其他頁面不能連到 GitHub API；頁尾有管理入口
+    for(const other of ['index.html','profile/index.html',`document/${PRIMARY_TAB}/index.html`]){const html=read(w,other);assert.ok(html.includes("connect-src 'self';"),other);assert.ok(!html.includes('api.github.com'),other);assert.ok(html.includes('href="/iliavia-static/admin/"'),other);}
+    assert.match(read(w,'robots.txt'),/Disallow: \/iliavia-static\/admin\//);
+    await run(w,{offline:true,env:{GITHUB_REPOSITORY:'bad repo/../x'}});assert.ok(read(w,'admin/index.html').includes('data-repo=""'));
+    // 自動檢查和手動更新兩種方式都在
+    const workflow=readFileSync(join(ROOT,'.github','workflows','deploy.yml'),'utf8');assert.ok(workflow.includes('schedule:'));assert.ok(workflow.includes('workflow_dispatch:'));
+  }finally{w.cleanup();}
 });
 test('image sizes are read from PNG, GIF, JPEG and WebP headers without changing the bytes',()=>{
   const bytes=s=>Uint8Array.from(Buffer.from(s,'base64'));

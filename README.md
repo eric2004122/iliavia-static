@@ -3,6 +3,7 @@
 非官方粉絲共編筆記的靜態網站版，免費掛在 GitHub Pages，澳門、台灣和其他地區都能直接開。
 
 - GitHub Actions 約每 15 分鐘讀一次固定的 Google 共編文件（唯讀、不登入、不修改文件），產生整個網站，**內容有變才重新發布**。
+- 管理員也可以在網站的「管理員：更新網站」頁（`/admin/`）按「更新網站」，馬上重新讀取並發布。
 - 頁面和 Sites 版一樣：首頁、介紹、共編筆記（六個分頁的完整原文與原圖）、更新紀錄、閱讀設定、關於這裡。
 - 沒有伺服器：搜尋、「再抽一句」、「隨機抽一個」都在瀏覽器裡做。
 - 性癖、生理期、身體疾病欄位預設收合；預設不讓搜尋引擎收錄。
@@ -15,7 +16,19 @@
 3. **第一次發布**：repo → Actions → 左邊「更新並發布網站」→ Run workflow。跑完（約 2–5 分鐘）網站就在 `https://<你的帳號>.github.io/<repo名稱>/`，Settings → Pages 上方也會顯示網址。
    - 推上去的當下會自動跑一次；如果那時還沒做第 2 步，那次會失敗，做完第 2 步再手動跑一次就好。
 
-之後每 15 分鐘自動檢查（Google 文件改了之後，通常半小時內會出現在網站上）；想馬上更新就到 Actions 手動 Run workflow。
+之後每 15 分鐘自動檢查（Google 文件改了之後，通常半小時內會出現在網站上）；想馬上更新，就用下面的「更新網站」按鈕，或到 Actions 手動 Run workflow。
+
+### 管理員的「更新網站」按鈕
+
+網站頁尾有「管理員：更新網站」，打開是 `/admin/`。第一次要貼上自己的 GitHub 權杖：
+
+1. GitHub 右上角頭像 → Settings → Developer settings → Personal access tokens → **Fine-grained tokens** → Generate new token。
+2. Repository access 選 **Only select repositories**，只選這個 repo；Permissions → Repository permissions → **Actions: Read and write**，其他都不用開；Expiration 建議 90 天。
+3. 複製 `github_pat_` 開頭的權杖，貼到管理頁按「儲存權杖」。之後按「更新網站」，頁面會顯示進度，完成後約 2～5 分鐘上線。
+
+- 權杖只存在管理員自己的瀏覽器（不勾「在這台裝置記住」就只到關閉分頁為止），只會送到 `api.github.com`，網站與 repo 都不保存。一般訪客沒有權杖，看得到頁面也按不動。
+- 這種權杖只能用在自己或所屬組織的 repo。要讓其他管理員也能按，最簡單是把 repo 移到免費的 GitHub 組織（Organization），再把他們加進組織。
+- 管理頁的安全政策只允許連到 `api.github.com`，其他頁面一律只連本站。
 
 ### 選填設定
 

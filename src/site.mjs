@@ -11,12 +11,14 @@ import * as view from './views.mjs';
 // 網站設定只用環境變數（GitHub Actions 的 Variables）：
 // SEARCH_INDEXING=1 才讓搜尋引擎收錄；CONTACT_EMAIL 選填；SITE_URL 只在允許收錄時用來產生 sitemap。
 // BASE_PATH 由 GitHub Pages 自動給（專案網址是 /repo名稱/）；本機預覽不設就是 /。
+// GITHUB_REPOSITORY（帳號/repo）由 GitHub Actions 自動給，管理頁的「更新網站」按鈕用它找到要觸發的流程。
 export function siteOptions(env={}){
   const email=/^[^\s@<>"']{1,64}@[^\s@<>"']{1,190}\.[a-z]{2,}$/i.test(env.CONTACT_EMAIL||'')?env.CONTACT_EMAIL:'';
   let siteUrl='';try{const u=new URL(env.SITE_URL||'');if(u.protocol==='https:')siteUrl=u.origin;}catch{/* 沒設就不產生 sitemap */}
   const segments=String(env.BASE_PATH||'').split('/').filter(Boolean);
   if(segments.some(s=>!/^[A-Za-z0-9._-]+$/.test(s)||/^\.+$/.test(s)))throw new Error('BASE_PATH 格式不正確。');
-  return {searchIndexing:env.SEARCH_INDEXING==='1',contactEmail:email,siteUrl,base:'/'+segments.map(s=>s+'/').join('')};
+  const repo=/^[A-Za-z0-9-]{1,39}\/[A-Za-z0-9._-]{1,100}$/.test(env.GITHUB_REPOSITORY||'')?env.GITHUB_REPOSITORY:'';
+  return {searchIndexing:env.SEARCH_INDEXING==='1',contactEmail:email,siteUrl,repo,base:'/'+segments.map(s=>s+'/').join('')};
 }
 // 版面裡的站內網址都從 / 開始，這裡統一加上前綴。原文都已轉義（" 變成 &quot;），所以只會改到版面自己的屬性。
 export const withBase=(html,base)=>base==='/'?html:html.replace(/(\s(?:href|src|action|data-[a-z-]+-url)=")\/(?!\/)/g,'$1'+base);
@@ -48,6 +50,7 @@ export async function writeSite(state,{outDir,stateDir,publicDir,env={},log=()=>
   await page('document/changes',view.changes(revisions,updatedAt,opts));
   await page('settings',view.settings(opts));
   await page('about',view.about(opts));
+  await page('admin',view.admin(opts));
   await writeFile(join(outDir,'404.html'),withBase(view.notFound(opts),base));
 
   // 原圖：只放目前分頁用到的
@@ -63,6 +66,6 @@ export async function writeSite(state,{outDir,stateDir,publicDir,env={},log=()=>
   await json('picks.json',[...data.memes.assets.map((asset,i)=>({kind:'meme',url:at(imageUrl(MEMES_TAB,asset)),alt:imageAlt(asset,i+1),size:opts.sizes.get(asset.file)||null})),...data.history.events.filter(e=>!e.milestone).map(e=>({kind:'history',number:e.number,text:e.text,url:e.url}))]);
 
   const pages=['/','/profile/','/document/',...tabs.map(t=>view.tabPath(t.tab_id)),'/about/'].map(at);
-  await writeFile(join(outDir,'robots.txt'),opts.searchIndexing?`User-agent: *\nDisallow: ${at('/data/')}\n${opts.siteUrl?`Sitemap: ${opts.siteUrl}${at('/sitemap.xml')}\n`:''}`:'User-agent: *\nDisallow: /\n');
+  await writeFile(join(outDir,'robots.txt'),opts.searchIndexing?`User-agent: *\nDisallow: ${at('/data/')}\nDisallow: ${at('/admin/')}\n${opts.siteUrl?`Sitemap: ${opts.siteUrl}${at('/sitemap.xml')}\n`:''}`:'User-agent: *\nDisallow: /\n');
   if(opts.searchIndexing&&opts.siteUrl)await writeFile(join(outDir,'sitemap.xml'),`<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${pages.map(p=>`<url><loc>${view.h(opts.siteUrl+p)}</loc></url>`).join('')}</urlset>`);
 }

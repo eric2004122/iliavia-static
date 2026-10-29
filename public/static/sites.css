@@ -12,4 +12,18 @@
 .reader-block-space{max-block-size:2em;overflow:hidden}.reader-field-label,.reader-field-value{overflow-wrap:anywhere}.reader-gallery img{max-inline-size:100%;block-size:auto}
 .admin-nav{display:flex;gap:20px;flex-wrap:wrap}.checkbox-label{display:flex;align-items:start;gap:12px}.checkbox-label input{margin-top:5px;inline-size:20px;block-size:20px;flex:none}
 .pagination{display:flex;justify-content:center;gap:20px;padding:24px}.entry-card{overflow-wrap:anywhere}.error-page{max-inline-size:800px;margin-inline:auto}.error-page .button{margin:8px}
+/* 管理員的更新頁 */
+.admin-status{margin:8px 0 0;color:var(--ink)}
+.admin-actions{display:flex;flex-wrap:wrap;align-items:center;gap:12px 20px;margin-top:16px}
+/* 連結樣式會蓋掉 hidden，這裡補回來；還不能按的按鈕要看得出來 */
+.admin-actions [hidden]{display:none}
+.admin-actions .button:disabled{opacity:.45;cursor:not-allowed;box-shadow:none;transform:none}
+.admin-token-form{display:grid;gap:14px;max-inline-size:34rem}
+.admin-token-form .field input{inline-size:100%}
+/* 全站輸入框有統一的大框樣式，勾選框要還原成原本的小方框 */
+.admin-token-form .checkbox-label{align-items:center;min-block-size:44px;cursor:pointer}
+.admin-token-form .checkbox-label input{appearance:auto;-webkit-appearance:checkbox;margin:0;padding:0;min-inline-size:0;min-block-size:0;border:0;border-radius:0;box-shadow:none;background:none;accent-color:var(--accent)}
+.admin-help{margin-top:16px}
+.admin-help summary{min-block-size:44px;display:flex;align-items:center;cursor:pointer}
+.admin-help ol{display:grid;gap:8px;margin:8px 0 12px;padding-inline-start:1.4em}
 @media(max-width:600px){.filter-panel{display:grid;grid-template-columns:minmax(0,1fr)}.panel,.source-panel,.entry-body,.reader-change-card{padding:18px}.reader-change-card pre{padding:12px}.page-heading h1{font-size:clamp(28px,8vw,40px)}}

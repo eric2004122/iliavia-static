@@ -8,4 +8,5 @@
 - 站內網址在版面裡一律從 `/` 開始，由 `src/site.mjs` 的 `withBase()` 加上 GitHub Pages 的 `/repo名稱/`；瀏覽器端腳本的網址都從 `data-*-url` 屬性讀，不要寫死 `/data/`、`/images/`。
 - 網站設定只用 GitHub Actions Variables：`SEARCH_INDEXING`（預設不收錄）、`CONTACT_EMAIL`、`SITE_URL`。沒有後台、沒有伺服器端程式。
 - 驗證：`npm ci`、`npm test`（合成資料，不連網）。改版面可用 `npm run build:offline` 與 `npm run preview` 在本機確認。
-- 部署只透過 `.github/workflows/deploy.yml`（推到 `main`、排程或手動執行）；不要另外建立付費資源。
+- 部署只透過 `.github/workflows/deploy.yml`：每 15 分鐘自動檢查（內容有變才發布）、推到 `main`、或手動執行；不要另外建立付費資源。
+- 手動更新有網站上的管理頁 `/admin/`（`src/views.mjs` 的 `admin()`、`public/static/update.js`）：用管理員自己的 GitHub fine-grained 權杖（只開 Actions: Read and write）呼叫 workflow_dispatch。權杖只存在管理員瀏覽器、只送往 api.github.com，絕不寫進程式、repo、網站資料或聊天；只有管理頁的 CSP 允許 api.github.com。repo 名稱由 Actions 的 `GITHUB_REPOSITORY` 自動提供。
