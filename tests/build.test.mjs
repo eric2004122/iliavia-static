@@ -11,6 +11,8 @@ import {TABS,PRIMARY_TAB,HISTORY_TAB,MEMES_TAB} from '../src/catalog.mjs';
 import {SourceError,allowedRedirect} from '../src/source.mjs';
 import {buildProfile,splitList,sensitiveKind} from '../src/profile.mjs';
 import {imageSize} from '../src/image-size.mjs';
+import {presentation} from '../src/presentation.mjs';
+const presentationFor=(body,tab=PRIMARY_TAB)=>presentation(body,tab,TABS.find(t=>t.id===tab).title);
 const ROOT=join(dirname(fileURLToPath(import.meta.url)),'..');
 
 // 1×1 PNG（合成）
@@ -122,6 +124,18 @@ test('image sizes are read from PNG, GIF, JPEG and WebP headers without changing
   const jpeg=Uint8Array.from([0xff,0xd8,0xff,0xe0,0,4,0,0,0xff,0xc0,0,11,8,0,5,0,7,1,1,0x11,0,0xff,0xd9]);assert.deepEqual(imageSize(jpeg),[7,5]);
   const webp=new Uint8Array(30);webp.set([...Buffer.from('RIFF')],0);webp.set([...Buffer.from('WEBPVP8X')],8);webp.set([9,0,0,4,0,0],24);assert.deepEqual(imageSize(webp),[10,5]);
   assert.equal(imageSize(Uint8Array.from([1,2,3])),null);
+});
+test('decorated section titles start new sections; bracketed values and numbered lines with colons stay inside their card',()=>{
+  const body='♡₍ᐢ.ˬ.ᐢ₎♡Iliavia筆記♡₍ᐢ.ˬ.ᐢ₎♡\n♡🏆 榮譽榜♡₍ᐢ.ˬ.ᐢ₎\n♡ 事蹟列表\n\t1. 測試冠軍\n2. 很大聲地說：「測試」\n\t\n♡⚖️開庭紀錄♡₍ᐢ.ˬ.ᐢ₎\n♡ 潛在原告\n\t【等待測試填寫】\n\t♡🗣️ 口頭禪紀錄♡₍ᐢ.ˬ.ᐢ₎\n♡ 口頭禪\n\t「測試」\n';
+  const p=presentationFor(body),blocks=p.sections.flatMap(s=>s.blocks);
+  assert.equal(blocks.map(b=>b.raw).join(''),body);
+  assert.deepEqual(blocks.filter(b=>b.kind==='heading').map(b=>b.raw.trim()),['♡₍ᐢ.ˬ.ᐢ₎♡Iliavia筆記♡₍ᐢ.ˬ.ᐢ₎♡','♡🏆 榮譽榜♡₍ᐢ.ˬ.ᐢ₎','♡⚖️開庭紀錄♡₍ᐢ.ˬ.ᐢ₎','♡🗣️ 口頭禪紀錄♡₍ᐢ.ˬ.ᐢ₎']);
+  const fields=blocks.filter(b=>b.kind==='field');assert.deepEqual(fields.map(b=>b.label),['♡ 事蹟列表','♡ 潛在原告','♡ 口頭禪']);
+  assert.ok(fields[0].raw.includes('很大聲地說：「測試」'));assert.ok(fields[1].raw.includes('【等待測試填寫】'));assert.ok(!fields[1].raw.includes('口頭禪紀錄'));
+  // 原文件的段落標題已經說明是哪一段，網站的分組名稱不再重複，也不進目錄
+  assert.ok(p.sections.filter(s=>s.kind==='fields').every(s=>s.show_title===false));assert.ok(p.toc.every(t=>t.title.includes('₍ᐢ')));
+  // 一般內容裡的【影片標題】【#標籤】不是標題
+  assert.ok(presentationFor('鼠兔語錄\n測試\n\t【測試直播#3】測試【#Iliavia】\n','t.cx5wy0vc5dmy').sections.flatMap(s=>s.blocks).every(b=>b.kind!=='heading'||b.raw.startsWith('鼠兔語錄')));
 });
 test('profile cards split lists outside brackets and know which fields are sensitive',()=>{
   assert.deepEqual(splitList('甲、乙（含、頓號）、丙'),['甲','乙（含、頓號）','丙']);
